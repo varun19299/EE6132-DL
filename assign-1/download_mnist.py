@@ -48,7 +48,7 @@ def load_mnist(path='data',refresh=False):
 
     with open(images_path, 'rb') as imgpath:
         magic, num, rows, cols = struct.unpack(">IIII", imgpath.read(16))
-        images = np.fromfile(imgpath,  dtype=np.uint8).reshape(len(labels), 28,28)
+        images = np.fromfile(imgpath,  dtype=np.uint8).reshape(len(labels), 784)
 
     DATA['train']=zip(images,labels)
 
