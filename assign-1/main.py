@@ -33,7 +33,7 @@ def main():
     model= network.MLP([784,1000,500,250,10])
 
     validation=[]
-    for key in [f'fold-{f}' for f in range(4)]:
+    for key in ['fold-{f}'.format(f=f) for f in range(4)]:
         validation+=list(DATA[key])
     validation=np.array(validation)
 
