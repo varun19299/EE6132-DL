@@ -14,7 +14,7 @@ class MLP(object):
     Model for a MLP.
     '''
 
-    def __init__(self, sizes=list(), activation='sigmoid',learning_rate=1.0, mini_batch_size=64,
+    def __init__(self, sizes=list(), activation='sigmoid',learning_rate=0.8,momentum=0.5, mini_batch_size=64,
                  epochs=10,l2=0.0,l1=0.0):
         """
         
@@ -50,6 +50,8 @@ class MLP(object):
         self.weights = [np.zeros((1))] + [np.random.randn(y, x) for y, x in
                                           zip(sizes[1:], sizes[:-1])]
 
+        self.v=[np.random.randn(*weights.shape) for weights in self.weights ]
+
         # Input layer does not have any biases. self.biases[0] is redundant.
         self.biases = [np.random.randn(y, 1) for y in sizes]
 
@@ -60,6 +62,8 @@ class MLP(object):
         # Input layer has no weights, biases associated. Hence z = wx + b is not
         # defined for input layer. self.zs[0] is redundant.
         self._zs = [np.zeros(bias.shape) for bias in self.biases]
+        self.vb = [np.random.randn(*bias.shape) for bias in self.biases]
+
 
         # Training examples can be treated as activations coming out of input
         # layer. Hence self.activations[0] = (training_example).
@@ -68,6 +72,7 @@ class MLP(object):
         self.mini_batch_size = mini_batch_size
         self.epochs = epochs
         self.eta = learning_rate
+        self.mu=momentum
 
     def fit(self, training_data, validation_data=[], test_data=[]):
         """
@@ -111,6 +116,7 @@ class MLP(object):
                 loss=0
                 # Iterate over a mini batch
                 for x, y in mini_batch:
+                    random.shuffle(mini_batch)
                     self._forward_prop(x)
                     delta_nabla_b, delta_nabla_w = self._back_prop(x, y)
 
@@ -118,19 +124,27 @@ class MLP(object):
                     nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
                     nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
 
-                    loss+=self.log_likelihood_loss(y)
+                    loss+=self.cross_entropy_loss(y)
 
-                self.weights = [
-                    w \
+                self.v = [
+                    v*self.mu
                     - self.eta / self.mini_batch_size * dw \
                     - self.eta * self.l2/self.mini_batch_size *w \
                     - self.eta * self.l1 * np.sign(w)/self.mini_batch_size \
-                    for w, dw in zip(self.weights, nabla_w)]
+                    for v,w, dw in zip(self.v,self.weights, nabla_w)]
+
+                self.weights = [
+                    w - v
+                    for w, v in zip(self.weights, self.v)]
+
+                self.vb = [
+                    vb*self.mu \
+                    - (self.eta / self.mini_batch_size) * db \
+                    for vb, db in zip(self.vb, nabla_b)]
 
                 self.biases = [
-                    b \
-                    - (self.eta / self.mini_batch_size) * db \
-                    for b, db in zip(self.biases, nabla_b)]
+                    b -vb \
+                    for b, vb in zip(self.biases, self.vb)]
 
                 loss=loss/len(mini_batch)
                 epoch_loss+=loss
@@ -145,7 +159,7 @@ class MLP(object):
             if len(validation_data) :
                 accuracy,cm, precision, recall, F1_score = self.validate(validation_data)
                 print('Epoch {epoch}, cm {cm}, \n accuracy {accuracy}, \n precision {precision},\n  recall {recall}, \n F1_score {F1_score}'\
-                .format(epoch=epoch,cm=cm,test_loss=test_loss,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
+                .format(epoch=epoch,cm=cm,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
            
             if len(test_data) :
                 accuracy, cm, precision, recall, F1_score = self.validate(test_data)
@@ -158,8 +172,6 @@ class MLP(object):
 
                 print('Epoch {epoch}, test loss {test_loss}, accuracy {accuracy}, precision {precision}, recall {recall}, F1_score {F1_score}'\
                 .format(epoch=epoch,test_loss=test_loss,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
-
-            print('Processed epoch', epoch)
 
     def validate(self, validation_data, confusion_matrix=False):
         """
@@ -175,10 +187,11 @@ class MLP(object):
         * F1 Score
 
         """
-        validation_results = [(self.predict(data[0])[0] == data[1]) for data in validation_data]
-        accuracy= sum(result for result in validation_results)/len(validation_data)
+        validation_results = [(self.predict(x) == np.where(y==1)[0][0]) for x,y in validation_data]
+        accuracy= sum(validation_results)/len(validation_data)
         
-        y_pred=[self.predict(x)[0] for x,y in validation_data]
+        # a scalar, not one hot
+        y_pred=[self.predict(x) for x,y in validation_data]
         cm=MLP.confusion_matrix(validation_data[:,1],y_pred)
 
         recall = np.diag(cm) / np.sum(cm, axis = 1)
@@ -200,7 +213,7 @@ class MLP(object):
         """
 
         self._forward_prop(x)
-        return np.argmax(self._activations[-1]), self._activations[-1]
+        return np.argmax(self._activations[-1])
 
     def _forward_prop(self, x):
         self._activations[0] = np.array(x).reshape((len(x),1))
@@ -330,8 +343,12 @@ class MLP(object):
         else:
             sample_weight = np.asarray(sample_weight)
 
+        y_true=[np.where(r==1)[0][0] for r in y_true]
+        
+        '''
         n_labels = labels.size
         label_to_ind = dict((y, x) for x, y in enumerate(labels))
+
         # convert yt, yp into index
         y_pred = np.array([label_to_ind.get(x, n_labels + 1) for x in y_pred])
         y_true = np.array([label_to_ind.get(x, n_labels + 1) for x in y_true])
@@ -348,9 +365,9 @@ class MLP(object):
             dtype = np.int64
         else:
             dtype = np.float64
-
+        '''
         CM = sp.coo_matrix((sample_weight, (y_true, y_pred)),
-                        shape=(n_labels, n_labels), dtype=dtype,
+                        shape=(len(labels), len(labels)), dtype=np.float64,
                         ).toarray()
 
         return CM
