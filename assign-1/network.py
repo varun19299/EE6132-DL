@@ -159,7 +159,7 @@ class MLP(object):
                 print('Epoch {epoch}, test loss {test_loss}, accuracy {accuracy}, precision {precision}, recall {recall}, F1_score {F1_score}'\
                 .format(epoch=epoch,test_loss=test_loss,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
 
-            print('Processed epoch,' epoch)
+            print('Processed epoch', epoch)
 
     def validate(self, validation_data, confusion_matrix=False):
         """
