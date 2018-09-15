@@ -45,12 +45,14 @@ def load_mnist(path='data',refresh=False):
     with open(labels_path, 'rb') as lpath:
         magic, n = struct.unpack('>II', lpath.read(8))
         labels = np.fromfile(lpath, dtype=np.uint8)
+        labels = [vectorized_result(label) for label in labels]
+        labels= np.array(labels)
 
     with open(images_path, 'rb') as imgpath:
         magic, num, rows, cols = struct.unpack(">IIII", imgpath.read(16))
         images = np.fromfile(imgpath,  dtype=np.uint8).reshape(len(labels), 784)
 
-    DATA['train']=zip(images,labels)
+    DATA['train']=list(zip(images,labels))
 
     kind='t10k'
     labels_path = os.path.join( path, '{kind}-labels-idx1-ubyte'.format(kind=kind))
@@ -59,6 +61,9 @@ def load_mnist(path='data',refresh=False):
     with open(labels_path, 'rb') as lpath:
         magic, n = struct.unpack('>II', lpath.read(8))
         labels = np.fromfile(lpath, dtype=np.uint8)
+        labels = [vectorized_result(label) for label in labels]
+        labels= np.array(labels)
+
     with open(images_path, 'rb') as imgpath:
         magic, num, rows, cols = struct.unpack(">IIII", imgpath.read(16))
         images = np.fromfile(imgpath,  dtype=np.uint8).reshape(len(labels), 784)
@@ -70,7 +75,7 @@ def load_mnist(path='data',refresh=False):
 
     for i in range(5):
         fold='fold-{i}'.format(i=i)    
-        DATA[fold]=zip(images[indice_list[i]],labels[indice_list[i]])
+        DATA[fold]=list(zip(images[indice_list[i]],labels[indice_list[i]]))
     
     return DATA
 
