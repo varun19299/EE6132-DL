@@ -14,7 +14,7 @@ class MLP(object):
     Model for a MLP.
     '''
 
-    def __init__(self, sizes=list(), activation='sigmoid',learning_rate=1.0, mini_batch_size=16,
+    def __init__(self, sizes=list(), activation='sigmoid',learning_rate=1.0, mini_batch_size=64,
                  epochs=10,l2=0.0,l1=0.0):
         """
         
@@ -47,7 +47,7 @@ class MLP(object):
 
         # First term corresponds to layer 0 (input layer). No weights enter the
         # input layer and hence self.weights[0] is redundant.
-        self.weights = [np.zeros((sizes[0],1))] + [np.random.randn(y, x) for y, x in
+        self.weights = [np.zeros((1))] + [np.random.randn(y, x) for y, x in
                                           zip(sizes[1:], sizes[:-1])]
 
         # Input layer does not have any biases. self.biases[0] is redundant.
@@ -88,7 +88,7 @@ class MLP(object):
             
             #shuffle train data
             random.shuffle(training_data)
-            print(training_data.shape)
+            
             mini_batches = [
                 training_data[k:k + self.mini_batch_size] for k in
                 range(0, len(training_data), self.mini_batch_size)]
