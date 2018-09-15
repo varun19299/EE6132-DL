@@ -101,7 +101,8 @@ class MLP(object):
             epoch_loss=0
 
             # Printing start info
-            print(f"Starting Epoch {epoch}, number of mini_batches {len(mini_batches)}, mini_batch size {self.mini_batch_size}")
+            print("Starting Epoch {epoch}, number of mini_batches {len(mini_batches)}, mini_batch size {mini_batch_size}".\
+            format(epoch=epoch,mini_batches=mini_batches,mini_batch_size=self.mini_batch_size))
 
             for mini_batch,count in zip(mini_batches,range(len(mini_batches))):
                 nabla_b = [np.zeros(bias.shape) for bias in self.biases]
@@ -139,11 +140,12 @@ class MLP(object):
 
             bar.finish()
             epoch_loss=epoch_loss/(len(mini_batches))
-            print(f'Epoch loss {epoch_loss}')
+            print('Epoch loss ',epoch_loss)
 
             if len(validation_data) :
                 accuracy,cm, precision, recall, F1_score = self.validate(validation_data)
-                print(f'Epoch {epoch}, cm {cm}, \n accuracy {accuracy}, \n precision {precision},\n  recall {recall}, \n F1_score {F1_score}')
+                print('Epoch {epoch}, cm {cm}, \n accuracy {accuracy}, \n precision {precision},\n  recall {recall}, \n F1_score {F1_score}'\
+                .format(epoch=epoch,cm=cm,test_loss=test_loss,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
            
             if len(test_data) :
                 accuracy, cm, precision, recall, F1_score = self.validate(test_data)
@@ -154,9 +156,10 @@ class MLP(object):
                     test_loss+=self.log_likelihood_loss(y)
                 test_loss=test_loss/len(test_data)
 
-                print(f'Epoch {epoch}, test loss {test_loss}, accuracy {accuracy}, precision {precision}, recall {recall}, F1_score {F1_score}')
+                print('Epoch {epoch}, test loss {test_loss}, accuracy {accuracy}, precision {precision}, recall {recall}, F1_score {F1_score}'\
+                .format(epoch=epoch,test_loss=test_loss,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
 
-            print(f'Processed epoch {epoch}')
+            print('Processed epoch,' epoch)
 
     def validate(self, validation_data, confusion_matrix=False):
         """
