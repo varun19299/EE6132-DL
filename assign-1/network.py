@@ -227,7 +227,7 @@ class MLP(object):
         nabla_b = [np.zeros(bias.shape) for bias in self.biases]
         nabla_w = [np.zeros(weight.shape) for weight in self.weights]
 
-        error = self.cost_derivative(self._activations[-1], y) * \
+        error = self.cost_derivative(y) * \
             self.activation_prime(zs[-1])
         
         #* self.activation_prime(self._zs[-1])
