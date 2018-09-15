@@ -14,7 +14,7 @@ class MLP(object):
     Model for a MLP.
     '''
 
-    def __init__(self, sizes=list(), activation='sigmoid',learning_rate=0.8,momentum=0.5, mini_batch_size=64,
+    def __init__(self, sizes=list(), activation='softmax',learning_rate=0.8,momentum=0.5, mini_batch_size=64,
                  epochs=10,l2=0.0,l1=0.0):
         """
         
@@ -227,7 +227,10 @@ class MLP(object):
         nabla_b = [np.zeros(bias.shape) for bias in self.biases]
         nabla_w = [np.zeros(weight.shape) for weight in self.weights]
 
-        error = (self._activations[-1] - y) #* self.activation_prime(self._zs[-1])
+        error = self.cost_derivative(self._activations[-1], y) * \
+            self.activation_prime(zs[-1])
+        
+        #* self.activation_prime(self._zs[-1])
         nabla_b[-1] = error
         nabla_w[-1] = error.dot(self._activations[-2].transpose())
 
@@ -241,6 +244,11 @@ class MLP(object):
 
         return nabla_b, nabla_w
 
+    def cost_derivative(y):
+        '''
+        Compute cost derivative
+        '''
+        return self._activations[-1]-y
     def cross_entropy_loss(self, y):
         '''
         Used for sigmoid final layer
