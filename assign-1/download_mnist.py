@@ -39,8 +39,8 @@ def load_mnist(path='data',refresh=False):
                     shutil.copyfileobj(f_in, f_out)
 
     kind='train'
-    labels_path = os.path.join(path, f'{kind}-labels-idx1-ubyte')
-    images_path = os.path.join(path, f'{kind}-images-idx3-ubyte')
+    labels_path = os.path.join(path, '{kind}-labels-idx1-ubyte'.format(kind=kind))
+    images_path = os.path.join(path, '{kind}-images-idx3-ubyte'.format(kind=kind))
     
     with open(labels_path, 'rb') as lpath:
         magic, n = struct.unpack('>II', lpath.read(8))
@@ -53,8 +53,8 @@ def load_mnist(path='data',refresh=False):
     DATA['train']=zip(images,labels)
 
     kind='t10k'
-    labels_path = os.path.join( path, f'{kind}-labels-idx1-ubyte')
-    images_path = os.path.join( path, f'{kind}-images-idx3-ubyte')
+    labels_path = os.path.join( path, '{kind}-labels-idx1-ubyte'.format(kind=kind))
+    images_path = os.path.join( path, '{kind}-images-idx3-ubyte'.format(kind=kind))
 
     with open(labels_path, 'rb') as lpath:
         magic, n = struct.unpack('>II', lpath.read(8))
@@ -69,7 +69,7 @@ def load_mnist(path='data',refresh=False):
     indice_list=np.split(indices,5)
 
     for i in range(5):
-        fold=f'fold-{i}'    
+        fold='fold-{i}'.format(i=i)    
         DATA[fold]=zip(images[indice_list[i]],labels[indice_list[i]])
     
     return DATA
