@@ -101,8 +101,8 @@ class MLP(object):
             epoch_loss=0
 
             # Printing start info
-            print("Starting Epoch {epoch}, number of mini_batches {len(mini_batches)}, mini_batch size {mini_batch_size}".\
-            format(epoch=epoch,mini_batches=mini_batches,mini_batch_size=self.mini_batch_size))
+            print("Starting Epoch {epoch}, number of mini_batches {mini_batches}, mini_batch size {mini_batch_size}".\
+            format(epoch=epoch,mini_batches=len(mini_batches),mini_batch_size=self.mini_batch_size))
 
             for mini_batch,count in zip(mini_batches,range(len(mini_batches))):
                 nabla_b = [np.zeros(bias.shape) for bias in self.biases]
