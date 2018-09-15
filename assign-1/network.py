@@ -244,7 +244,7 @@ class MLP(object):
 
         return nabla_b, nabla_w
 
-    def cost_derivative(y):
+    def cost_derivative(self,y):
         '''
         Compute cost derivative
         '''
