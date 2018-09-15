@@ -1,0 +1,9 @@
+#GITIGNORE
+
+# Ignore Tar balls and zips
+*/*/*.zip
+*/*/*.gz
+*/*/*ubyte
+
+# Ignore weight files
+*/*/*.npz
