@@ -106,7 +106,7 @@ class MLP(object):
                 training_data[k:k + self.mini_batch_size] for k in
                 range(0, len(training_data), self.mini_batch_size)]
             
-            mini_batches=mini_batches[:2]
+            #mini_batches=mini_batches[:2]
             epoch_loss=0
 
             # Printing start info
@@ -345,7 +345,7 @@ class MLP(object):
             x=np.array(x).reshape(28,28)
             plt.imshow(x,cmap="grey")
             print(" Prediction {y_pred} Top 3 Probabilites {y_top} Truth {y_label}"\
-            .format(y_pred=y_pred,y_top=np.sort(a)[-3:-1:-1]),y_label=y_label))
+            .format(y_pred=y_pred,y_top=np.sort(a)[-3:-1:-1]),y_label=y_label)
 
     def load(self, filename='model.npz'):
         """
