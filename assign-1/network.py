@@ -87,6 +87,10 @@ class MLP(object):
         val_losses=[]
         test_losses=[]
 
+        train_accuracies=[]
+        val_accuracies=[]
+        test_accuracies=[]
+
         mini_batches = [
                 training_data[k:k + self.mini_batch_size] for k in
                 range(0, len(training_data), self.mini_batch_size)]
@@ -167,6 +171,7 @@ class MLP(object):
 
                 loss=loss/len(mini_batch)
                 accuracy=accuracy/len(mini_batch)
+                train_accuracies.append(accuracy)
                 epoch_loss+=loss
 
                 t.set_description('Loss = {loss} Accuracy= {accuracy}'.format(loss=loss,accuracy=accuracy))
@@ -176,14 +181,16 @@ class MLP(object):
             train_losses.append(epoch_loss)
 
             if len(validation_data) :
-                val_loss=self.pretty_stats(validation_data,name="Val")
+                val_loss,accuracy=self.pretty_stats(validation_data,name="Val")
                 val_losses.append(val_loss)
+                val_accuracies.append(accuracy)
 
             if len(test_data) :
-                test_loss=self.pretty_stats(test_data,name="Test")
+                test_loss,accuracy=self.pretty_stats(test_data,name="Test")
                 test_losses.append(test_loss)
+                test_accuracies.append(accuracy)
 
-        return [train_losses,val_losses,test_losses]
+        return [train_losses,val_losses,test_losses,train_accuracies,val_accuracies,test_accuracies]
 
     def validate(self, validation_data):
         """
@@ -224,7 +231,7 @@ class MLP(object):
         loss=self.measure_loss(data)
         print('{name} Stats:\n {name} loss {loss} \ncm {cm} \n accuracy {accuracy}\n precision {precision} \n recall {recall} \n F1_score {F1_score}\n'\
         .format(name=name,loss=loss,cm=cm,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
-        return loss
+        return loss,accuracy
 
     def measure_loss(self,data):
         '''

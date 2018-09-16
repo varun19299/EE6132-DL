@@ -24,7 +24,7 @@ def run_stats(mlp,DATA,tag):
     Run five fold statistics on cross val.
     '''
     for key in ['fold-{f}'.format(f=f) for f in range(4)]:
-        data=DATA[key]
+        data=np.array(DATA[key])
         mlp.pretty_stats(data,name=tag+"-cross_val-"+key)
 
 def main():
@@ -50,13 +50,17 @@ def main():
 
     if args.question in ["1","2","5"]:
         model= network.MLP([784,1000,500,250,10])
-        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4']),\
+
+        train_losses,val_losses,test_losses,\
+        train_accuracies,val_accuracies,test_accuracies\
+        =model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4']),\
         epochs=epochs,\
         initial_lr=initial_lr,\
         final_lr=final_lr)
         print(val_losses,test_losses)
 
-        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid")
+        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_loss")
+        helper.plot([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_accuracy")
         run_stats(model,DATA,tag="sigmoid")
 
     elif args.question=="3":
@@ -67,27 +71,35 @@ def main():
 
         model= network.MLP([784,1000,500,250,10],activation="relu",\
         variance=variance)
-        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4']),\
+
+        train_losses,val_losses,test_losses,\
+        train_accuracies,val_accuracies,test_accuracies\
+        =model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4']),\
         epochs=epochs,\
         initial_lr=initial_lr,\
         final_lr=final_lr)
         print(val_losses,test_losses)
 
-        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="relu")
+        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="relu_loss")
+        helper.plot([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_accuracy")
         run_stats(model,DATA,tag="relu")
 
     elif args.question=="4":
         train_data=noise_addition(DATA['train'],sigma=1e-3)
 
         model= network.MLP([784,1000,500,250,10])
-        train_losses,val_losses,test_losses=model.fit(np.array(train_data),validation,np.array(DATA['fold-4']),\
+
+        train_losses,val_losses,test_losses,\
+        train_accuracies,val_accuracies,test_accuracies\
+        =model.fit(np.array(train_data),validation,np.array(DATA['fold-4']),\
         l2=0.1,\
         l1=0.01,\
         epochs=epochs,\
         initial_lr=initial_lr,\
         final_lr=final_lr)
 
-        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_regularised")
+        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_regularised_loss")
+        helper.plot([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_regularised_accuracy")
         run_stats(model,DATA,tag="sigmoid_regularised")
     
     elif args.question=="6":
@@ -102,7 +114,9 @@ def main():
         test_data = np.array(preprocess(DATA['fold-4']))
         print(val_data.shape)
 
-        train_losses,val_losses,test_losses=model.fit(train_data,val_data,test_data,\
+        train_losses,val_losses,test_losses,\
+        train_accuracies,val_accuracies,test_accuracies\
+        =model.fit(train_data,val_data,test_data,\
         epochs=epochs,\
         initial_lr=initial_lr,\
         final_lr=final_lr)
@@ -110,7 +124,8 @@ def main():
 
         DATA_HOG_fold={'fold-{f}'.format(f=f):preprocess(DATA['fold-{f}'.format(f=f)]) for f in range(4)}
 
-        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_HOG")
+        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_HOG_loss")
+        helper.plot([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_HOG_accuracy")
         run_stats(model,DATA_HOG_fold,tag="sigmoid")
 
     elif args.question=="7":
