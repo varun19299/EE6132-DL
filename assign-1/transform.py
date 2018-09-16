@@ -5,11 +5,9 @@ import numpy as np
 from sklearn import svm
 
 bin_n = 16  # Number of bins
-svm_params = dict(kernel_type=cv2.SVM_LINEAR,
-                  svm_type=cv2.SVM_C_SVC)
 
 affine_flags = cv2.WARP_INVERSE_MAP | cv2.INTER_LINEAR
-
+SZ = 28
 
 def deskew(img):
     m = cv2.moments(img)
@@ -33,3 +31,24 @@ def noise_addition(DATA,sigma=1e-4):
             DATA.append(img,y)
     print("New Dataset size ",len(DATA))
     return DATA
+
+def hog(img):
+    gx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
+    gy = cv2.Sobel(img, cv2.CV_32F, 0, 1)
+    mag, ang = cv2.cartToPolar(gx, gy)
+    # quantizing binvalues in (0...16)
+    bins = np.int32(bin_n * ang / (2 * np.pi))
+    bin_cells = bins[:10, :10], bins[10:, :10], bins[:10, 10:], bins[10:, 10:]
+    mag_cells = mag[:10, :10], mag[10:, :10], mag[:10, 10:], mag[10:, 10:]
+    hists = [np.bincount(b.ravel(), m.ravel(), bin_n)
+             for b, m in zip(bin_cells, mag_cells)]
+    hist = np.hstack(hists)     # hist is a 64 bit vector
+    return hist
+
+def preprocess(DATA, rows=28, cols=28):
+    DATA2=[]
+    for x,y in DATA:
+        hogdata = hog(deskew(x.reshape(rows, cols))) 
+        x_=np.float32(hogdata).reshape(64,)
+        DATA2.append([x_,y])
+    return DATA2
