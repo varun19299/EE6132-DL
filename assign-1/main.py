@@ -17,6 +17,15 @@ parser=argparse.ArgumentParser()
 parser.add_argument("--question",help="Which question to display answers for.",required=True)
 args=parser.parse_args()
 
+def noise_addition(DATA,sigma=1e-4):
+    def _pertub(x,sigma):
+        return x+np.random.randn(*x.shape)*sigma
+    l=len(DATA)
+    for i in range(l):
+        x,y=DATA[i][0],DATA[l][1]
+        DATA.append(_pertub(x,sigma),y)
+    return DATA
+
 def run_stats(mlp,DATA,tag):
     '''
     Run five fold statistics on cross val.
@@ -58,8 +67,8 @@ def main():
         run_stats(model,DATA,tag="sigmoid")
 
     elif args.question=="3":
-        epochs=10
-        initial_lr=8e-3
+        epochs=4
+        initial_lr=8e-2
         final_lr=8e-6
         variance=0.0001
 
@@ -76,9 +85,10 @@ def main():
 
     elif args.question=="4":
         variance=0.0001
+        train_data=noise_addition(DATA['train'],sigma=1e-3)
 
         model= network.MLP([784,1000,500,250,10],activation="relu",variance=variance)
-        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4']),\
+        train_losses,val_losses,test_losses=model.fit(np.array(train_data),validation,np.array(DATA['fold-4']),\
         l2=0.1,\
         l1=0.01,\
         epochs=epochs,\
