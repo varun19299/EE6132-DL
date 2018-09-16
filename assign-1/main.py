@@ -104,7 +104,7 @@ def main():
     
     elif args.question=="6":
         epochs=10
-        initial_lr=8e-3
+        initial_lr=8e-4
         final_lr=8e-6
         variance=0.001
 
@@ -131,19 +131,24 @@ def main():
         run_stats(model,DATA_HOG_fold,tag="sigmoid")
 
     elif args.question=="7":
-        train_data = preprocess(DATA['train'])
+        train_data = np.array(preprocess(DATA['train']))
         val_data = np.array(preprocess(validation))
         test_data = np.array(preprocess(DATA['fold-4']))
 
-        print(val_data.shape)
         svc = svm.SVC(kernel='linear')
-        svc.fit(train_data[:,0], train_data[:,1])
+        labels=np.array([np.where(train_data[:,1][x]==1)[0][0] for x in range(len(train_data[:,1]))])
+        labels=np.array(labels).reshape((len(labels),1))
 
-        DATA_HOG_fold={'fold-{f}'.format(f=f):preprocess(DATA['fold-{f}'.format(f=f)]) for f in range(4)}
+        train_data=np.vstack(train_data[:,0])
+        svc.fit(train_data,labels)
 
-        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_HOG")
-        run_stats(model,DATA_HOG_fold,tag="sigmoid")
-        
+        y_true=np.array([np.where(test_data[:,1][x]==1)[0][0] for x in range(len(test_data[:,1]))])
+        test_data=np.vstack(test_data[:,0])
+        y_pred=svc.predict(test_data)
+
+        print(sklearn.metrics.accuracy_score(y_true, y_pred))
+        print(sklearn.metrics.classification_report(y_true, y_pred))
+
     else:
         print("Invalid question {}".format(args.question))
 
