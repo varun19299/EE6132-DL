@@ -90,7 +90,6 @@ class MLP(object):
         lr_scheduler=np.linspace(initial_lr,final_lr,self.epochs)
         mu_scheduler=np.array([momentum]*2)
         mu_scheduler=np.append(mu_scheduler,np.linspace(momentum,0.99,self.epochs-2))
-        print(mu_scheduler)
 
         for epoch,lr,mu in zip(range(self.epochs),lr_scheduler,mu_scheduler):
 
@@ -109,7 +108,8 @@ class MLP(object):
             epoch_loss=0
 
             # Printing start info
-            print("Starting Epoch {epoch}, number of mini_batches {mini_batches}, mini_batch size {mini_batch_size}".\
+            print("\n------------------------------------------------\n");
+            print("\n Starting Epoch {epoch}, number of mini_batches {mini_batches}, mini_batch size {mini_batch_size}\n".\
             format(epoch=epoch,mini_batches=len(mini_batches),mini_batch_size=self.mini_batch_size))
 
             # tqdm
@@ -170,19 +170,17 @@ class MLP(object):
 
             if len(validation_data) :
                 accuracy,cm, precision, recall, F1_score = self.validate(validation_data)
-                
-                val_losses.append(self.measure_loss(validation_data))
-
-                print('Epoch {epoch}, \ncm {cm}, \n accuracy {accuracy}, \n precision {precision},\n  recall {recall}, \n F1_score {F1_score} \n'\
-                .format(epoch=epoch,cm=cm,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
+                val_loss=self.measure_loss(validation_data)
+                val_losses.append(val_loss)
+                print('Val Stats:\n Val Loss {val_loss} \ncm {cm}\n accuracy {accuracy}\n precision {precision} \n recall {recall} \n F1_score {F1_score}\n'\
+                .format(val_loss=val_loss,cm=cm,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
            
             if len(test_data) :
-                accuracy, cm, precision, recall, F1_score = self.validate(test_data)
-
-                test_losses.append(self.measure_loss(test_data))
-
-                print('Epoch {epoch}, test loss {test_loss}, accuracy {accuracy}, precision {precision}, recall {recall}, F1_score {F1_score}\n'\
-                .format(epoch=epoch,test_loss=test_losses,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
+                accuracy, cm, precision, recall, F1_score = self.validate(test_data)  
+                test_loss=self.measure_loss(test_data)
+                test_losses.append(test_loss)
+                print('Test Stats:\n test loss {test_loss} \ncm {cm} \n accuracy {accuracy}\n precision {precision} \n recall {recall} \n F1_score {F1_score}\n'\
+                .format(test_loss=test_loss,cm=cm,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
 
         return [train_losses,val_losses,test_losses]
 
@@ -227,6 +225,7 @@ class MLP(object):
             a=self._forward_prop(x)
             loss+=self.cross_entropy_loss(a,y)
         loss=loss/len(data)
+        return loss
 
     def predict(self, x):
         """

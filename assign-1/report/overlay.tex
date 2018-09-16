@@ -1,0 +1,51 @@
+%
+\documentclass[12pt, oneside]{article}
+\usepackage[margin=0.85in]{geometry}
+\linespread{1}
+\usepackage{xcolor}
+\usepackage[colorlinks=false, linkbordercolor=white, citebordercolor=white, 
+    filebordercolor=white, urlbordercolor=white]{hyperref}
+    
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{minted}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead{}
+\fancyhead[L]{CS6023 GPU Programming} 
+\fancyhead[R]{Varun EE16B068} %%% Vyplnte sve jmeno a prijmeni
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+
+\usepackage{titlesec}
+\titlespacing{\chapter}{0pt}{*4}{*2.5}
+
+\titleformat{\chapter}{\normalfont\huge\bf}{\thechapter}{20pt}{\huge\bf}
+
+
+
+\usepackage{listings}
+\definecolor{dgray}{gray}{0.35} 
+\definecolor{lgray}{gray}{0.95} 
+
+\lstset{ % nastaveni vzhledu R-kodu
+language=R, % nastaveni jazyka R
+basicstyle=\ttfamily\small, % typ a velikost pisma R-kodu
+backgroundcolor=\color{lgray}, % barva pozadi R-kodu
+commentstyle=\ttfamily\small\itshape\color{dgray}, % barva komentare k funkcim
+showstringspaces=false, % zakaz zvyraznovani mezer
+numbers=left, % cislovani vlevo
+numberstyle=\ttfamily\small, % typ pisma a velikost cislovani
+stepnumber=1, % cislovani po kroku jedna
+firstnumber=last, % kumulativni cislovani radku v po sobe nasledujicich castech s R-kodem
+breaklines=T} % automaticke zalamovani kodu na konci radku
+
+\begin{document}
+
+\input{UCO-prijmeni-jmeno-predmet-title-page}
+\addtocontents{toc}{~\hfill\textbf{Page}\par}
+\input{UCO-prijmeni-jmeno-predmet-text} % vlozi soubor s hlavnim textem
+\end{document}

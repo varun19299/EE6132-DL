@@ -44,12 +44,13 @@ def main():
         epochs=epochs,\
         initial_lr=initial_lr,\
         final_lr=final_lr)
+        print(val_losses,test_losses)
         helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid")
 
     elif args.question=="3":
-        epochs=5
-        initial_lr=0.0008
-        final_lr=0.000008
+        epochs=10
+        initial_lr=0.08
+        final_lr=0.0008
         variance=0.0001
 
         model= network.MLP([784,1000,500,250,10],activation="relu",\
@@ -58,6 +59,7 @@ def main():
         epochs=epochs,\
         initial_lr=initial_lr,\
         final_lr=final_lr)
+        print(val_losses,test_losses)
         helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="relu")
 
     elif args.question=="4":

@@ -1,0 +1,264 @@
+\section {Implementation and Technical Notes}
+
+The code was run on a \textit{GTX 1080 Ti} and not the cluster of \textit{K'40s}. This could be a reason for variance in the optimal configuration found for the GPUs. However, the code does not make any hardware assumptions and can therefore be run on any suitable cluster. \\
+
+CUDA version 9.0 was used to compile the code, with \lstinline{nvcc} as the device compiler and \lstinline{gcc} as the host compiler.
+
+\section {Question 1 and 2}
+
+Querying Device parameters via \lstinline{ cudaDeviceProp}.\\
+
+Following parameters were queried:
+\begin{itemize}
+\item Scope of support of L1 Cache (Global or local): \quad \textbf{Yes}
+\item Size of L2 Cache: \quad \textbf{Yes}
+\item Maximum permissible threads per block: \quad \textbf{1024}
+\item Registers allocated per block: \quad \textbf{65536}
+\item Registers available in a streaming multiprocessor: \quad \textbf{65536}
+\item Warp Size (bytes) : \quad \textbf{32}
+\item Total amount of memory available in the GPU (in bytes): \quad \textbf{11719409664} (12GB)
+\end{itemize}
+
+\subsection {Code Blocks (pertinent only)}
+\begin{lstlisting}
+cudaGetDeviceCount(&nDevices);
+    for (int i = 0; i < nDevices; i++) {
+        cudaDeviceProp prop;
+        cudaGetDeviceProperties(&prop, i);
+        printf("Device Number: %d\n", i);
+        printf("  Device name: %s\n", prop.name);
+        printf("  Memory Clock Rate (KHz): %d\n",prop.memoryClockRate);
+        printf("  Memory Bus Width (bits): %d\n",prop.memoryBusWidth);
+        printf("  Is L1 Cache supported globally :(0/1) %d\n",prop.globalL1CacheSupported);
+        printf("  Is L1 Cache supported locally :(0/1) %d\n",prop.localL1CacheSupported);
+       // ..Other Device Properties.. //
+        printf("  No of registers available in a streaming multiprocessor : %d\n",prop.regsPerMultiprocessor);
+        printf("  Warp Size :(bytes) %d\n",prop.warpSize);
+        printf("  Grid Size :(bytes) %ld\n",prop.maxGridSize);
+        printf("  Total memory :(bytes) %ld\n",prop.totalGlobalMem);
+        printf("  Peak Memory Bandwidth (GB/s): %f\n\n",2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6);
+    }
+}
+\end{lstlisting}
+
+We run the list of properties for all possible GPU's present in the given machine.
+
+\bigskip
+\subsection {Roof-line Plot}
+\noindent Plot of the roof-line model for the queried GPU.\\
+
+The Roof-line model helps understand the bottlenecks in achieving greater performance. Till a certain operational intensity, it is limited by the bandwidth of global context transfer (host to device data). Further, there is the peak \textbf[TFLOPS] limit, which is a hardware-architecture limit.\\
+
+For the case of the \textit{GeForce 1080 Ti}, the peak FLOPS may be computed as:
+$$ Cores * FLOPS *Clock Frequency$$
+This yields 11.3 T FLOPS for the GPU, which matches closely with the manufacturer's benchmarks (11.5). Peak data bandwidth is obtained from the device query.
+
+The resultant plot : \textbf{Figure 1}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[angle=0,width=0.8\textwidth]{Figure_1.png}
+\caption{Roof-line model for \textbf{GTX 1080 Ti}}
+\end{figure}
+
+  \subsection{Other Details}
+Device Number: 0
+  
+  
+  \begin{table}[ht]
+\footnotesize
+\centering
+\begin{tabular}{r||rrr}
+Parameter & Specifics  \\ 
+ \hline \hline
+Device name & GeForce GTX 1080 Ti \\
+  Memory Clock Rate (KHz) & 5505000 \\
+  Memory Bus Width (bits) & 352 \\
+  Is L1 Cache supported globally & Yes \\
+  Is L1 Cache supported locally & Yes \\
+  L2 Cache Size (bytes) & 2883584 \\
+  Max no of threads per block & 1024 \\
+  No of registers available in a block & 65536 \\
+  No of registers available in a streaming multiprocessor & 65536 \\
+  Warp Size (bytes)&  32 \\
+  Grid Size (bytes) & 140731727872496 \\
+  Total memory (bytes) & 11719409664 \\
+  Peak Memory Bandwidth (GB/s) & 484.440000 \\
+\end{tabular}
+\caption{Device specifications, \textit{device:0}}
+\end{table}
+
+\newpage
+
+\section {Question 3 and 4}
+\noindent We find the optimal number of threads per block to run the given vector addition empirically. \\
+
+\textbf{Question 3} involves writing kernel functions to implement vector addition over multiple threads, one operation each thread. We output the result of adding two $2^{15} $sized vectors, which are randomly generated. \\
+
+For \textbf{Question 4}, we empirically determine the optimal number of threads per block. From \textbf{Question 1} we know that the maximum permissible threads per block is 1024, hence we vary the threads per block from 128 to 1024 in powers of 2, and calculate the run-time in each case. \\
+
+Note that, the run time has been calculated without considering the host allocation time. We believe that this is a valid choice, since the host allocation time maybe isolated for each process and therefore can be effectively excluded from the run time calculations.\\
+
+\subsection{Code Changes}
+\begin{lstlisting}
+	__global__ void VecAdd(float* A, float* B, float* C, int N){
+      // Host code
+      int i = blockDim.x * blockIdx.x + threadIdx.x;
+      if (i < N)
+          C[i] = A[i] + B[i];
+    }
+    // .... //
+    
+    printf("Array A (first 10 values) \n ");
+    for(loop = 0; loop < N; loop++){
+    h_A[loop] = rand() % 100 + 1;
+      if (loop<10){
+          printf("%f ", h_A[loop]);
+      }
+    }
+
+    printf("\nArray B (first 10 values) \n ");
+    for(loop = 0; loop < N; loop++){
+        h_B[loop] = rand() % 100 + 1;
+        if (loop<10){
+            printf("%f ", h_B[loop]);
+       }
+     }
+// .... //
+cudaEventRecord(start, 0);
+VecAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A,d_B, d_C, N);
+cudaEventRecord(stop, 0);
+cudaEventSynchronize(stop);
+cudaEventElapsedTime(&time_spent, start, stop);
+time_spent=time_spent/(avg_loop-1)*10;
+\end{lstlisting} \\
+
+\begin{table}[ht]
+\footnotesize
+\centering
+\begin{tabular}{r||rrr}
+ SI (vector addition of $2^{15}$ size) & Threads per Block (powers of 2) & Average GPU run-time (for 10 runs)  \\ 
+ \hline \hline
+1 & 32 &  0.312521 \\ 
+2& 64  & 0.304183 \\
+3& 128 & 0.304020 \\
+4& 256 & 0.303870 \\
+5& 512 & 0.300294 \\
+6 & 1024 &0.286491 \\
+\end{tabular}
+\caption{Average time for 10 passes versus threads per block}
+\end{table}
+
+The consequent plot: \textbf{Figure 2}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[angle=0,width=0.7\textwidth]{Figure_2.png}
+\caption{Average Runtime versus Threads per Block for \textbf{GTX 1080 Ti}}
+\end{figure}
+
+Hence, \textbf{optimal no of threads per block} is \textbf{1024}.\\
+
+\subsection{Reasoning}
+
+The optimal threads per block may not be upper bounded for this low intensity (operational), and hence, using the maximum possible number of threads per block is optimal.
+\section {Question 5}
+
+Here, we empirically investigate the dependence of run-time on the number of operations per thread.
+
+\subsection{Code Changes} 
+\begin{lstlisting}
+	__global__ void VecAdd(float* A, float* B, float* C, int N){
+      // Host code
+      int j;
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+    if (i < N_op){
+        for (j=0;j<op_loop;j++)
+            C[i*op_loop+j] = A[i*op_loop+j] + B[i*op_loop+j];
+    }
+    }
+   // Array of op's to try//
+   for (op_loop_ii=0;op_loop_ii<10;op_loop_ii++){
+        op_loop_array[op_loop_ii]=pow(2,op_loop_ii);
+    }
+// Run kernel over these ops and average each run //
+cudaEventRecord(start, 0);
+VecAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A,d_B, d_C, N);
+cudaEventRecord(stop, 0);
+cudaEventSynchronize(stop);
+cudaEventElapsedTime(&time_spent, start, stop);
+time_spent=time_spent/(avg_loop-1)*10;
+\end{lstlisting} \\
+
+\subsection{Run-Times}
+
+\textbf{Table 3} contains the relevant logs.
+
+\begin{table}[ht]
+\footnotesize
+\centering
+\begin{tabular}{r||rrr}
+ SI (vector addition of $2^{15}$ size) & Ops per loop (powers of 2) & Average GPU run-time (for 10 runs)  \\ 
+ \hline \hline
+1 & 1 &  0.298492 \\ 
+2& 2  & 0.349331 \\
+3& 4 & 0.296480 \\
+4& 8 & 0.340138 \\
+5& 16 & 0.374680 \\
+6 & 32 &0.454981 \\
+7 & 64 &0.570481 \\
+8 & 128 &0.864831 \\
+\end{tabular}
+\caption{Average time for 10 passes versus ops per thread}
+\end{table}
+
+The consequent plot: \textbf{Figure 3} \\
+
+\begin{figure}[ht]
+\centering
+\includegraphics[angle=0,width=0.7\textwidth]{Figure_3.png}
+\caption{Average Runtime versus Ops per Thread for \textbf{GTX 1080 Ti}}
+\end{figure}
+
+Hence, \textbf{optimal no of ops per thread} is \textbf{4}.\\
+
+\subsection{Reasoning}
+
+The optimal operations per block is dependent on the level of SIMD parallelism a single thread may be able to achieve. With an optimal of \textbf{4}, it is possible that the device has over \textbf{8 ALU's} per thread-context. \\
+
+\section {Question 6 and 7}
+Again, empirically, we observe the changes in run-time per vector size of the random vectors being operated upon.
+ 
+ \subsection{Run-Times}
+ 
+ No major code changes here, besides varying the vector sizes given these optimal \textit{Threads per Block} and \textit{operations per thread}. \\
+
+\begin{table}[ht]
+\footnotesize
+\centering
+\begin{tabular}{r||rrr}
+ SI (vector addition of $2^{15}$ size) & Vector Size (powers of 2) & Average GPU run-time ( averaged over 1000 runs)  \\ 
+ \hline \hline
+1 & $2^{15}$ &  0.032892 \\ 
+2& $2^{16}$   & 0.032452 \\
+3&  $2^{17}$ & 0.044452 \\
+4&  $2^{18}$ & 0.101014 \\
+5&  $2^{19}$ & 0.198954 \\
+6 &  $2^{20}$ &0.341814 \\
+\end{tabular}
+\caption{Average time for single pass versus Vector Size}
+\end{table}
+ 
+ Consequent plot: \textbf{Figure 4}
+ 
+ \begin{figure}[ht]
+\centering
+\includegraphics[angle=0,width=0.7\textwidth]{Figure_4.png}
+\caption{Average Runtime versus Vector Size for \textbf{GTX 1080 Ti}}
+\end{figure}
+
+
+\subsection{Reasoning}
+
+The variation of runtimes with size is not linear $O(n)$ as would have been expected of a CPU, but is more or less constant upto $2^{18}$ as a vector size. Post this, it is possible that the size no longer allows the same degree of parallelism with respect to caching, Grid-to-thread transfer, etc.
+ 
