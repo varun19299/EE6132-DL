@@ -23,14 +23,14 @@ def noise_addition(DATA,sigma=1e-4):
         return x+np.random.randn(*x.shape)*sigma
     l=len(DATA)
     for i in range(l):
-        x,y=DATA[i][0],DATA[l][1]
+        x,y=DATA[i][0],DATA[i][1]
         if i%10==0:
-            DATA.append(_pertub(x,sigma),y)
+            DATA.append([_pertub(x,sigma),y])
         if i%10==1:
             img=deskew(x.reshape((28,28))).reshape((784,1))
-            DATA.append(img,y)
+            DATA.append([img,y])
     print("New Dataset size ",len(DATA))
-    return DATA
+    return np.array(DATA)
 
 def hog(img):
     gx = cv2.Sobel(img, cv2.CV_32F, 1, 0)

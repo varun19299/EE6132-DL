@@ -77,10 +77,9 @@ def main():
         run_stats(model,DATA,tag="relu")
 
     elif args.question=="4":
-        variance=0.0001
         train_data=noise_addition(DATA['train'],sigma=1e-3)
 
-        model= network.MLP([784,1000,500,250,10],activation="relu",variance=variance)
+        model= network.MLP([784,1000,500,250,10])
         train_losses,val_losses,test_losses=model.fit(np.array(train_data),validation,np.array(DATA['fold-4']),\
         l2=0.1,\
         l1=0.01,\
@@ -88,14 +87,19 @@ def main():
         initial_lr=initial_lr,\
         final_lr=final_lr)
 
-        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="relu_regularised")
-        run_stats(model,DATA,tag="relu_regularised")
+        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_regularised")
+        run_stats(model,DATA,tag="sigmoid_regularised")
     
     elif args.question=="6":
+        epochs=10
+        initial_lr=8e-3
+        final_lr=8e-6
+        variance=0.001
+
         model= network.MLP([64,32,10])
         train_data = preprocess(DATA['train'])
-        val_data = preprocess(validation)
-        test_data = preprocess(np.array(DATA['fold-4']))
+        val_data = np.array(preprocess(validation))
+        test_data = np.array(preprocess(DATA['fold-4']))
         print(val_data.shape)
 
         train_losses,val_losses,test_losses=model.fit(train_data,val_data,test_data,\
@@ -110,7 +114,6 @@ def main():
         run_stats(model,DATA_HOG_fold,tag="sigmoid")
 
     elif args.question=="7":
-        model= network.MLP([64,32,10])
         train_data = preprocess(DATA['train'])
         val_data = np.array(preprocess(validation))
         test_data = np.array(preprocess(DATA['fold-4']))

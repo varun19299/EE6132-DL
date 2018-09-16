@@ -95,7 +95,7 @@ class MLP(object):
         mn=len(mini_batches)
         lr_scheduler=np.linspace(initial_lr,final_lr,self.epochs*mn)
         mu_scheduler=np.array([momentum]*2)
-        mu_scheduler=np.append(mu_scheduler,np.linspace(momentum,0.99,(self.epochs-2)*mn))
+        mu_scheduler=np.append(mu_scheduler,np.linspace(momentum,0.99,self.epochs*mn-2))
 
         for epoch in range(self.epochs):
 
@@ -176,10 +176,12 @@ class MLP(object):
             train_losses.append(epoch_loss)
 
             if len(validation_data) :
-                self.pretty_stats(validation_data,name="Val")
-           
+                val_loss=self.pretty_stats(validation_data,name="Val")
+                val_losses.append(val_loss)
+
             if len(test_data) :
-                self.pretty_stats(test_data,name="Test")
+                test_loss=self.pretty_stats(test_data,name="Test")
+                test_losses.append(test_loss)
 
         return [train_losses,val_losses,test_losses]
 
