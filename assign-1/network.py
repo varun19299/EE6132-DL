@@ -87,15 +87,17 @@ class MLP(object):
         val_losses=[]
         test_losses=[]
 
-        lr_scheduler=np.linspace(initial_lr,final_lr,self.epochs)
+        mini_batches = [
+                training_data[k:k + self.mini_batch_size] for k in
+                range(0, len(training_data), self.mini_batch_size)]
+
+        # Degrade Lr's
+        mn=len(mini_batches)
+        lr_scheduler=np.linspace(initial_lr,final_lr,self.epochs*mn)
         mu_scheduler=np.array([momentum]*2)
-        mu_scheduler=np.append(mu_scheduler,np.linspace(momentum,0.99,self.epochs-2))
+        mu_scheduler=np.append(mu_scheduler,np.linspace(momentum,0.99,(self.epochs-2)*mn))
 
-        for epoch,lr,mu in zip(range(self.epochs),lr_scheduler,mu_scheduler):
-
-            # Linear lr scheduler
-            self.eta=lr
-            self.mu=mu
+        for epoch in range(self.epochs):
 
             # shuffle train data
             random.shuffle(training_data)
@@ -104,7 +106,7 @@ class MLP(object):
                 training_data[k:k + self.mini_batch_size] for k in
                 range(0, len(training_data), self.mini_batch_size)]
             
-            #mini_batches=mini_batches[:2]
+            mini_batches=mini_batches[:2]
             epoch_loss=0
 
             # Printing start info
@@ -115,6 +117,11 @@ class MLP(object):
             # tqdm
             t=trange(len(mini_batches))
             for mini_batch,count in zip(mini_batches,t):
+
+                # Linear lr scheduler
+                self.eta=lr_scheduler[epoch*mn+count]
+                self.mu=mu_scheduler[epoch*mn+count]
+                #  Nablas
                 nabla_b = [np.zeros(bias.shape) for bias in self.biases]
                 nabla_w = [np.zeros(weight.shape) for weight in self.weights]
 
@@ -169,18 +176,10 @@ class MLP(object):
             train_losses.append(epoch_loss)
 
             if len(validation_data) :
-                accuracy,cm, precision, recall, F1_score = self.validate(validation_data)
-                val_loss=self.measure_loss(validation_data)
-                val_losses.append(val_loss)
-                print('Val Stats:\n Val Loss {val_loss} \ncm {cm}\n accuracy {accuracy}\n precision {precision} \n recall {recall} \n F1_score {F1_score}\n'\
-                .format(val_loss=val_loss,cm=cm,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
+                self.pretty_stats(validation_data,name="Val")
            
             if len(test_data) :
-                accuracy, cm, precision, recall, F1_score = self.validate(test_data)  
-                test_loss=self.measure_loss(test_data)
-                test_losses.append(test_loss)
-                print('Test Stats:\n test loss {test_loss} \ncm {cm} \n accuracy {accuracy}\n precision {precision} \n recall {recall} \n F1_score {F1_score}\n'\
-                .format(test_loss=test_loss,cm=cm,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
+                self.pretty_stats(test_data,name="Test")
 
         return [train_losses,val_losses,test_losses]
 
@@ -212,6 +211,18 @@ class MLP(object):
         F1_score= 2*recall*precision/(recall+precision)
 
         return accuracy,cm,precision,recall,F1_score
+
+    def pretty_stats(self,data,name="Val"):
+        '''
+        Pretty prints stats
+
+        Loss, Confusion Matrix, Precision, Recall
+        '''
+        accuracy, cm, precision, recall, F1_score = self.validate(data)  
+        loss=self.measure_loss(data)
+        print('{name} Stats:\n {name} loss {loss} \ncm {cm} \n accuracy {accuracy}\n precision {precision} \n recall {recall} \n F1_score {F1_score}\n'\
+        .format(name=name,loss=loss,cm=cm,accuracy=accuracy,precision=precision,recall=recall,F1_score=F1_score ))
+        return loss
 
     def measure_loss(self,data):
         '''
@@ -333,7 +344,8 @@ class MLP(object):
 
             x=np.array(x).reshape(28,28)
             plt.imshow(x,cmap="grey")
-            print(f" Prediction {y_pred} Top 3 Probabilites {np.sort(a)[-3:-1:-1]} Truth {y_label}")
+            print(" Prediction {y_pred} Top 3 Probabilites {y_top} Truth {y_label}"\
+            .format(y_pred=y_pred,y_top=np.sort(a)[-3:-1:-1]),y_label=y_label))
 
     def load(self, filename='model.npz'):
         """
