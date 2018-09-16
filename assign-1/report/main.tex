@@ -1,8 +1,12 @@
 \section {Implementation and Technical Notes}
 
-The code was run on a \textit{GTX 1080 Ti} and not the cluster of \textit{K'40s}. This could be a reason for variance in the optimal configuration found for the GPUs. However, the code does not make any hardware assumptions and can therefore be run on any suitable cluster. \\
+Python 3.6 was used to code, with modularity of components being the main focus. Questions may be run as:
 
-CUDA version 9.0 was used to compile the code, with \lstinline{nvcc} as the device compiler and \lstinline{gcc} as the host compiler.
+\begin{lstlisting}
+    python3 main --question q
+\end{lstlisting}
+
+with questions numbered from 1 to 7. The tarball also contains a dockerfile, which maybe used to replicate results.
 
 \section {Question 1 and 2}
 
@@ -57,7 +61,7 @@ The resultant plot : \textbf{Figure 1}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[angle=0,width=0.8\textwidth]{Figure_1.png}
+%%\includegraphics[angle=0,width=0.8\textwidth]{Figure_1.png}
 \caption{Roof-line model for \textbf{GTX 1080 Ti}}
 \end{figure}
 
@@ -153,7 +157,7 @@ The consequent plot: \textbf{Figure 2}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[angle=0,width=0.7\textwidth]{Figure_2.png}
+%%\includegraphics[angle=0,width=0.7\textwidth]{Figure_2.png}
 \caption{Average Runtime versus Threads per Block for \textbf{GTX 1080 Ti}}
 \end{figure}
 
@@ -216,7 +220,7 @@ The consequent plot: \textbf{Figure 3} \\
 
 \begin{figure}[ht]
 \centering
-\includegraphics[angle=0,width=0.7\textwidth]{Figure_3.png}
+%%\includegraphics[angle=0,width=0.7\textwidth]{Figure_3.png}
 \caption{Average Runtime versus Ops per Thread for \textbf{GTX 1080 Ti}}
 \end{figure}
 
@@ -253,7 +257,7 @@ Again, empirically, we observe the changes in run-time per vector size of the ra
  
  \begin{figure}[ht]
 \centering
-\includegraphics[angle=0,width=0.7\textwidth]{Figure_4.png}
+%%\includegraphics[angle=0,width=0.7\textwidth]{Figure_4.png}
 \caption{Average Runtime versus Vector Size for \textbf{GTX 1080 Ti}}
 \end{figure}
 
