@@ -36,7 +36,7 @@ def relu(z):
     return np.maximum(z, 0)
 
 def relu_prime(z):
-    return float(z > 0)
+    return (z > 0).astype(float)
 
 map_fn={"sigmoid":{"function": sigmoid,"derivative": sigmoid_prime},\
         "relu":{"function": relu, "derivative": relu_prime},\

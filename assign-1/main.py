@@ -34,33 +34,50 @@ def main():
         validation+=DATA[key]
     validation=np.array(validation)
 
-    epochs=4
+    epochs=8
     initial_lr=0.08
     final_lr=0.00008
 
     if args.question in ["1","2"]:
         model= network.MLP([784,1000,500,250,10])
-        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4'])\
-        ,epochs=epochs,\
+        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4']),\
+        epochs=epochs,\
         initial_lr=initial_lr,\
         final_lr=final_lr)
         helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid")
 
     elif args.question=="3":
-        model= network.MLP([784,1000,500,250,10],activation="relu")
-        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4'])\
-        ,epochs=epochs,\
+        epochs=5
+        initial_lr=0.0008
+        final_lr=0.000008
+        variance=0.0001
+
+        model= network.MLP([784,1000,500,250,10],activation="relu",\
+        variance=variance)
+        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4']),\
+        epochs=epochs,\
         initial_lr=initial_lr,\
         final_lr=final_lr)
         helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="relu")
 
     elif args.question=="4":
         model= network.MLP([784,1000,500,250,10],activation="relu")
-        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4'])\
-        ,l2=0.1,l1=0.01,epochs=epochs,\
+        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4']),\
+        l2=0.1,\
+        l1=0.01,\
+        epochs=epochs,\
         initial_lr=initial_lr,\
         final_lr=final_lr)
         helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="relu")
+    
+    elif args.question=="5":
+        pass
+    elif args.question=="6":
+        pass
+    elif args.question=="7":
+        pass
+    else:
+        print("Invalid question {}".format(args.question))
 
 if __name__=='__main__':
     main()

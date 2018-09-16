@@ -19,7 +19,7 @@ class MLP(object):
     Model for a MLP.
     '''
 
-    def __init__(self, sizes=list(), activation='sigmoid',):
+    def __init__(self, sizes=list(), activation='sigmoid',variance=0.02):
         """
         
         Initialize a Neural Network model.
@@ -39,7 +39,6 @@ class MLP(object):
             and biases would be updated. Default size is 16.
 
         """
-        variance=0.02
 
         # Input layer is layer 0, followed by hidden layers layer 1, 2, 3...
         self.sizes = sizes
@@ -134,7 +133,7 @@ class MLP(object):
                     nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
                     nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
 
-                    loss+=self.log_likelihood_loss(a,y)
+                    loss+=self.cross_entropy_loss(a,y)
 
                 #print([dw for dw in nabla_w])
 
@@ -226,7 +225,7 @@ class MLP(object):
         loss=0
         for x,y in data:
             a=self._forward_prop(x)
-            loss+=self.log_likelihood_loss(a,y)
+            loss+=self.cross_entropy_loss(a,y)
         loss=loss/len(data)
 
     def predict(self, x):
@@ -290,13 +289,14 @@ class MLP(object):
             count+=1
 
         # backward pass
-        delta = self.cost_derivative(a_ss[-1], y) * self.activation_prime(zs[-1])
+        delta = self.cost_derivative(a_ss[-1], y) * activations.softmax_prime(zs[-1])
 
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, a_ss[-2].transpose())
         
         for l in range(2, self.num_layers):
             delta = np.dot(self.weights[-l+1].transpose(), delta) * self.activation_prime(zs[-l])
+            #print(delta)
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, a_ss[-l-1].transpose())
 
@@ -312,7 +312,9 @@ class MLP(object):
         '''
         Used for sigmoid final layer
         '''
-        return np.sum(np.nan_to_num(-y*np.log(a)-(1-y)*np.log(a)))
+        def _safe_ln(x, minval=0.0000000001):
+            return np.log(x.clip(min=minval))
+        return -np.sum(y*_safe_ln(a))/y.shape[1]
 
     def log_likelihood_loss(self,a, y):
         '''
