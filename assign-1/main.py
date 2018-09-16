@@ -118,6 +118,8 @@ def main():
         train_accuracies,val_accuracies,test_accuracies\
         =model.fit(train_data,val_data,test_data,\
         epochs=epochs,\
+        l2=0.1,\
+        l1=0.01,\
         initial_lr=initial_lr,\
         final_lr=final_lr)
         print(val_losses,test_losses)
@@ -141,6 +143,7 @@ def main():
 
         helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_HOG")
         run_stats(model,DATA_HOG_fold,tag="sigmoid")
+        
     else:
         print("Invalid question {}".format(args.question))
 

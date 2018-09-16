@@ -171,11 +171,11 @@ class MLP(object):
 
                 loss=loss/len(mini_batch)
                 accuracy=accuracy/len(mini_batch)
-                train_accuracies.append(accuracy)
                 epoch_loss+=loss
 
                 t.set_description('Loss = {loss} Accuracy= {accuracy}'.format(loss=loss,accuracy=accuracy))
 
+            train_accuracies.append(accuracy)
             epoch_loss=epoch_loss/(len(mini_batches))
             print('Epoch loss ',epoch_loss)
             train_losses.append(epoch_loss)
