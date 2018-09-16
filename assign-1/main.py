@@ -10,12 +10,12 @@ import argparse
 import numpy as np
 
 # Modules
-import download_mnist
+import download_mnist, helper
 import network
 
 parser=argparse.ArgumentParser()
-
-parser.add_argument("--activation",help="Which activation to use",)
+parser.add_argument("--question",help="Which question to display answers for.",required=True)
+args=parser.parse_args()
 
 def main():
     '''
@@ -29,16 +29,38 @@ def main():
     '''
 
     DATA=download_mnist.load_mnist()
-
-    model= network.MLP([784,1000,500,250,10])
-
     validation=[]
     for key in ['fold-{f}'.format(f=f) for f in range(4)]:
-        validation+=list(DATA[key])
+        validation+=DATA[key]
     validation=np.array(validation)
 
-    model.fit(np.array(list(DATA['train'])),validation,np.array(list(DATA['fold-4'])))
+    epochs=4
+    initial_lr=0.08
+    final_lr=0.00008
 
+    if args.question in ["1","2"]:
+        model= network.MLP([784,1000,500,250,10])
+        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4'])\
+        ,epochs=epochs,\
+        initial_lr=initial_lr,\
+        final_lr=final_lr)
+        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid")
+
+    elif args.question=="3":
+        model= network.MLP([784,1000,500,250,10],activation="relu")
+        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4'])\
+        ,epochs=epochs,\
+        initial_lr=initial_lr,\
+        final_lr=final_lr)
+        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="relu")
+
+    elif args.question=="4":
+        model= network.MLP([784,1000,500,250,10],activation="relu")
+        train_losses,val_losses,test_losses=model.fit(np.array(DATA['train']),validation,np.array(DATA['fold-4'])\
+        ,l2=0.1,l1=0.01,epochs=epochs,\
+        initial_lr=initial_lr,\
+        final_lr=final_lr)
+        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="relu")
 
 if __name__=='__main__':
     main()
