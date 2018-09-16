@@ -11,20 +11,12 @@ import numpy as np
 
 # Modules
 import download_mnist, helper
+from transform import *
 import network
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--question",help="Which question to display answers for.",required=True)
 args=parser.parse_args()
-
-def noise_addition(DATA,sigma=1e-4):
-    def _pertub(x,sigma):
-        return x+np.random.randn(*x.shape)*sigma
-    l=len(DATA)
-    for i in range(l):
-        x,y=DATA[i][0],DATA[l][1]
-        DATA.append(_pertub(x,sigma),y)
-    return DATA
 
 def run_stats(mlp,DATA,tag):
     '''
