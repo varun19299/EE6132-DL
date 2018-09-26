@@ -1,40 +1,24 @@
-# Copyright 2018 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-"""MNIST model training with TensorFlow eager execution.
+"""
+MNIST model training with TensorFlow eager execution.
 
 See:
 https://research.googleblog.com/2017/10/eager-execution-imperative-define-by.html
 
-This program demonstrates training of the convolutional neural network model
-defined in mnist.py with eager execution enabled.
-
-If you are not interested in eager execution, you should ignore this file.
 """
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+# Library imports
 import os
 import time
-
-# pylint: disable=g-bad-import-order
+import cv2
+import numpy as np
 from absl import app as absl_app
 from absl import flags
 import tensorflow as tf
-# pylint: enable=g-bad-import-order
- 
+
+# Module imports
 import dataset as mnist_dataset
 import mnist
 from utils.flags import core as flags_core
@@ -43,6 +27,7 @@ from utils.misc import model_helpers
 
 tfe = tf.contrib.eager
 
+IMAGE_SIZE=28
 
 def loss(logits, labels):
     return tf.reduce_mean(
@@ -57,9 +42,11 @@ def compute_accuracy(logits, labels):
     return tf.reduce_sum(
         tf.cast(tf.equal(predictions, labels), dtype=tf.float32)) / batch_size
 
-
 def train(model, optimizer, dataset, step_counter, log_interval=None):
-    """Trains model on `dataset` using `optimizer`."""
+    """
+    Trains model on MNIST.
+    
+    """
 
     start = time.time()
     for (batch, (images, labels)) in enumerate(dataset):
@@ -68,12 +55,14 @@ def train(model, optimizer, dataset, step_counter, log_interval=None):
             # Record the operations used to compute the loss given the input,
             # so that the gradient of the loss with respect to the variables
             # can be computed.
+
             with tf.GradientTape() as tape:
                 logits = model(images, training=True)
                 loss_value = loss(logits, labels)
                 tf.contrib.summary.scalar('loss', loss_value)
                 tf.contrib.summary.scalar(
                     'accuracy', compute_accuracy(logits, labels))
+
             grads = tape.gradient(loss_value, model.variables)
             optimizer.apply_gradients(
                 zip(grads, model.variables), global_step=step_counter)
@@ -83,11 +72,22 @@ def train(model, optimizer, dataset, step_counter, log_interval=None):
                       (batch, loss_value, rate))
                 start = time.time()
 
+def label_images(images, predictions):
+    images_captioned=[]
+
+    for image,prediction in zip(image,prediction):
+        image= image.reshape((IMAGE_SIZE,IMAGE_SIZE,1))
+        cv2.putText(image, "Prediction : {}".format(prediction),(25,5), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+        images_captioned.append(image)
+
+    return np.array(images_captioned)
 
 def test(model, dataset):
     """Perform an evaluation of `model` on the examples from `dataset`."""
     avg_loss = tfe.metrics.Mean('loss', dtype=tf.float32)
     accuracy = tfe.metrics.Accuracy('accuracy', dtype=tf.float32)
+
+    predictions=tf.argmax(logits, axis=1, output_type=tf.int64)
 
     for (images, labels) in dataset:
         logits = model(images, training=False)
@@ -97,13 +97,17 @@ def test(model, dataset):
             tf.cast(labels, tf.int64))
     print('Test set: Average loss: %.4f, Accuracy: %4f%%\n' %
           (avg_loss.result(), 100 * accuracy.result()))
+
     with tf.contrib.summary.always_record_summaries():
         tf.contrib.summary.scalar('loss', avg_loss.result())
         tf.contrib.summary.scalar('accuracy', accuracy.result())
+        tf.contrib.summary.image('predictions',
+        label_images(images,predictions))
 
 
 def run_mnist_eager(flags_obj):
-    """Run MNIST training and eval loop in eager mode.
+    """
+    Run MNIST training and eval loop in eager mode.
 
     Args:
       flags_obj: An object containing parsed flag values.
@@ -115,9 +119,11 @@ def run_mnist_eager(flags_obj):
     (device, data_format) = ('/gpu:0', 'channels_first')
     if flags_obj.no_gpu or not tf.test.is_gpu_available():
         (device, data_format) = ('/cpu:0', 'channels_last')
+
     # If data_format is defined in FLAGS, overwrite automatically set value.
     if flags_obj.data_format is not None:
         data_format = flags_obj.data_format
+
     print('Using device %s, and data format %s.' % (device, data_format))
 
     # Load the datasets
@@ -130,6 +136,9 @@ def run_mnist_eager(flags_obj):
     model = mnist.create_model(data_format)
     optimizer = tf.train.MomentumOptimizer(flags_obj.lr, flags_obj.momentum)
 
+    # Print model summary
+    print(model.summary())
+
     # Create file writers for writing TensorBoard summaries.
     if flags_obj.output_dir:
         # Create directories to which summaries will be written
@@ -141,6 +150,7 @@ def run_mnist_eager(flags_obj):
     else:
         train_dir = None
         test_dir = None
+
     summary_writer = tf.contrib.summary.create_file_writer(
         train_dir, flush_millis=10000)
     test_summary_writer = tf.contrib.summary.create_file_writer(
@@ -162,6 +172,8 @@ def run_mnist_eager(flags_obj):
                 train(model, optimizer, train_ds, step_counter,
                       flags_obj.log_interval)
             end = time.time()
+
+            # Note time taken
             print('\nTrain time for epoch #%d (%d total steps): %f' %
                   (checkpoint.save_counter.numpy() + 1,
                    step_counter.numpy(),
@@ -182,7 +194,7 @@ def define_mnist_eager_flags():
         help=flags_core.help_wrap('batches between logging training status'))
 
     flags.DEFINE_string(
-        name='output_dir', short_name='od', default=None,
+        name='output_dir', short_name='od', default='/tmp/mnist_eager',
         help=flags_core.help_wrap('Directory to write TensorBoard summaries'))
 
     flags.DEFINE_float(name='learning_rate', short_name='lr', default=0.01,
