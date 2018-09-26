@@ -87,14 +87,15 @@ def test(model, dataset):
     avg_loss = tfe.metrics.Mean('loss', dtype=tf.float32)
     accuracy = tfe.metrics.Accuracy('accuracy', dtype=tf.float32)
 
-    predictions=tf.argmax(logits, axis=1, output_type=tf.int64)
-
     for (images, labels) in dataset:
+        print(len(labels))
         logits = model(images, training=False)
         avg_loss(loss(logits, labels))
         accuracy(
             tf.argmax(logits, axis=1, output_type=tf.int64),
             tf.cast(labels, tf.int64))
+        predictions=tf.argmax(logits, axis=1, output_type=tf.int64)
+
     print('Test set: Average loss: %.4f, Accuracy: %4f%%\n' %
           (avg_loss.result(), 100 * accuracy.result()))
 
