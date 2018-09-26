@@ -59,8 +59,8 @@ def main():
         final_lr=final_lr)
         print(val_losses,test_losses)
 
-        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_loss")
-        helper.plot([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_accuracy")
+        helper.plot_loss([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_loss")
+        helper.plot_accuracy([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_accuracy")
         run_stats(model,DATA,tag="sigmoid")
 
     elif args.question=="3":
@@ -80,8 +80,8 @@ def main():
         final_lr=final_lr)
         print(val_losses,test_losses)
 
-        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="relu_loss")
-        helper.plot([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_accuracy")
+        helper.plot_loss([train_losses,val_losses,test_losses],epochs=epochs,name="relu_loss")
+        helper.plot_accuracy([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_accuracy")
         run_stats(model,DATA,tag="relu")
 
     elif args.question=="4":
@@ -98,8 +98,8 @@ def main():
         initial_lr=initial_lr,\
         final_lr=final_lr)
 
-        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_regularised_loss")
-        helper.plot([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_regularised_accuracy")
+        helper.plot_loss([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_regularised_loss")
+        helper.plot_accuracy([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_regularised_accuracy")
         run_stats(model,DATA,tag="sigmoid_regularised")
     
     elif args.question=="6":
@@ -126,8 +126,8 @@ def main():
 
         DATA_HOG_fold={'fold-{f}'.format(f=f):preprocess(DATA['fold-{f}'.format(f=f)]) for f in range(4)}
 
-        helper.plot([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_HOG_loss")
-        helper.plot([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_HOG_accuracy")
+        helper.plot_loss([train_losses,val_losses,test_losses],epochs=epochs,name="sigmoid_HOG_loss")
+        helper.plot_accuracy([train_accuracies,val_accuracies,test_accuracies],epochs=epochs,name="sigmoid_HOG_accuracy")
         run_stats(model,DATA_HOG_fold,tag="sigmoid")
 
     elif args.question=="7":
@@ -139,7 +139,7 @@ def main():
         labels=np.array([np.where(train_data[:,1][x]==1)[0][0] for x in range(len(train_data[:,1]))])
         labels=np.array(labels).reshape((len(labels),1))
 
-        train_data=np.vstack(train_data[:,0])
+        train_data=np.concatenate(train_data[:,0],axis=1)
         svc.fit(train_data,labels)
 
         y_true=np.array([np.where(test_data[:,1][x]==1)[0][0] for x in range(len(test_data[:,1]))])
