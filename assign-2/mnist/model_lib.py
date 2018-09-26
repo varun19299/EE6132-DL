@@ -4,7 +4,7 @@ Model Definition for MNIST.
 '''
 import tensorflow as tf
 
-def create_model(data_format):
+def create_model(data_format='channels_first'):
     """Model to recognize digits in the MNIST dataset.
 
     Args:
