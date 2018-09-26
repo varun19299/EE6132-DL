@@ -20,7 +20,7 @@ import tensorflow as tf
 
 # Module imports
 import dataset as mnist_dataset
-import mnist
+import model_lib
 from utils.flags import core as flags_core
 from utils.misc import model_helpers
 
@@ -113,7 +113,12 @@ def run_mnist_eager(flags_obj):
     Args:
       flags_obj: An object containing parsed flag values.
     """
-    tf.enable_eager_execution()
+
+    # Soft placement
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    tfe.enable_eager_execution(config=config)
+
     model_helpers.apply_clean(flags.FLAGS)
 
     # Automatically determine device and data_format
@@ -134,7 +139,7 @@ def run_mnist_eager(flags_obj):
         flags_obj.batch_size)
 
     # Create the model and optimizer
-    model = mnist.create_model(data_format)
+    model = model_lib.create_model(data_format)
     optimizer = tf.train.MomentumOptimizer(flags_obj.lr, flags_obj.momentum)
 
     # Print model summary
