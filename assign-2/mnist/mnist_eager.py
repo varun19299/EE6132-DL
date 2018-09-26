@@ -35,10 +35,10 @@ from absl import flags
 import tensorflow as tf
 # pylint: enable=g-bad-import-order
  
-from official.mnist import dataset as mnist_dataset
-from official.mnist import mnist
-from official.utils.flags import core as flags_core
-from official.utils.misc import model_helpers
+import dataset as mnist_dataset
+import mnist
+from utils.flags import core as flags_core
+from utils.misc import model_helpers
 
 
 tfe = tf.contrib.eager
