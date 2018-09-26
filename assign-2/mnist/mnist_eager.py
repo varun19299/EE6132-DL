@@ -34,7 +34,7 @@ from absl import app as absl_app
 from absl import flags
 import tensorflow as tf
 # pylint: enable=g-bad-import-order
-
+ 
 from official.mnist import dataset as mnist_dataset
 from official.mnist import mnist
 from official.utils.flags import core as flags_core
