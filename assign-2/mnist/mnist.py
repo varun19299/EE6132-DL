@@ -9,6 +9,7 @@ from __future__ import print_function
 from absl import app as absl_app
 from absl import flags
 import tensorflow as tf
+import cv2
 
 from mnist import dataset
 from utils.flags import core as flags_core
@@ -154,7 +155,7 @@ def model_fn(features, labels, mode, params):
         tf.identity(loss, 'cross_entropy')
 
         # Logging images
-        tf.contrib.summary.image()
+        tf.summary.image(image)
         
         return tf.estimator.EstimatorSpec(
             mode=tf.estimator.ModeKeys.EVAL,
@@ -196,7 +197,9 @@ def run_mnist(flags_obj):
 
     # Set up training and evaluation input functions.
     def train_input_fn():
-        """Prepare data for training."""
+        """
+        Prepare data for training.
+        """
 
         # When choosing shuffle buffer sizes, larger sizes result in better
         # randomness, while smaller sizes use less memory. MNIST is a small
