@@ -75,9 +75,12 @@ def train(model, optimizer, dataset, step_counter, log_interval=None):
 def label_images(images, predictions):
     images_captioned=[]
 
-    for image,prediction in zip(image,prediction):
+    for image,prediction in zip(images,predictions):
+        image=image.numpy()
+        prediction=prediction.numpy()
         image= image.reshape((IMAGE_SIZE,IMAGE_SIZE,1))
-        cv2.putText(image, "Prediction : {}".format(prediction),(25,5), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+        #cv2.putText(image, "Prediction : {}".format(prediction),(24,14), cv2.FONT_HERSHEY_SIMPLEX, 0.01, (255,255,255), cv2.LINE_AA)
+        image=1-image
         images_captioned.append(image)
 
     return np.array(images_captioned)
@@ -88,7 +91,7 @@ def test(model, dataset):
     accuracy = tfe.metrics.Accuracy('accuracy', dtype=tf.float32)
 
     for (images, labels) in dataset:
-        print(len(labels))
+        print(tf.size(labels))
         logits = model(images, training=False)
         avg_loss(loss(logits, labels))
         accuracy(
@@ -96,14 +99,14 @@ def test(model, dataset):
             tf.cast(labels, tf.int64))
         predictions=tf.argmax(logits, axis=1, output_type=tf.int64)
 
-    print('Test set: Average loss: %.4f, Accuracy: %4f%%\n' %
-          (avg_loss.result(), 100 * accuracy.result()))
+        print('Test set: Average loss: %.4f, Accuracy: %4f%%\n' %
+            (avg_loss.result(), 100 * accuracy.result()))
 
-    with tf.contrib.summary.always_record_summaries():
-        tf.contrib.summary.scalar('loss', avg_loss.result())
-        tf.contrib.summary.scalar('accuracy', accuracy.result())
-        tf.contrib.summary.image('predictions',
-        label_images(images,predictions))
+        with tf.contrib.summary.always_record_summaries():
+            tf.contrib.summary.scalar('loss', avg_loss.result())
+            tf.contrib.summary.scalar('accuracy', accuracy.result())
+            tf.contrib.summary.image('predictions',
+            label_images(images,predictions))
 
 
 def run_mnist_eager(flags_obj):
@@ -200,7 +203,7 @@ def define_mnist_eager_flags():
         help=flags_core.help_wrap('batches between logging training status'))
 
     flags.DEFINE_string(
-        name='output_dir', short_name='od', default='/tmp/mnist_eager',
+        name='output_dir', short_name='od', default='/tmp/tensorflow/mnist/',
         help=flags_core.help_wrap('Directory to write TensorBoard summaries'))
 
     flags.DEFINE_float(name='learning_rate', short_name='lr', default=0.01,
