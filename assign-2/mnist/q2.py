@@ -34,11 +34,21 @@ layer_dict = dict([(layer.name, layer) for layer in model.layers])
 
 print(layer_dict)
 
+def vis_layer(name): 
+    '''
+    Visualise a layer
+    '''
+    pass
+
+
+def intermediate_model(input,output):
+    return tf.keras.model(input,output)
+
 # Visualise activations
 max_nfmap = np.Inf ## print ALL the images
 input_img = model.layers[0].input
 visualizer = vis_lib.VisualizeImageMaximizeFmap(model=model,
-pic_shape = (96,96,1))
+pic_shape = (28,28,1))
 print("find images that maximize feature maps")
 argimage = visualizer.find_images(input_img,
                                   ['conv2d','conv2d_1'],
