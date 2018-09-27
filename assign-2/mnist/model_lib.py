@@ -4,7 +4,7 @@ Model Definition for MNIST.
 '''
 import tensorflow as tf
 
-def create_model(data_format='channels_first'):
+def create_model(data_format='channels_first', batch_norm=True):
     """Model to recognize digits in the MNIST dataset.
 
     Args:
@@ -35,6 +35,7 @@ def create_model(data_format='channels_first'):
                 padding='same',
                 data_format=data_format,
                 activation=tf.nn.relu),
+            l.BatchNormalization(),
             max_pool,
             l.Conv2D(
                 32,
@@ -42,6 +43,7 @@ def create_model(data_format='channels_first'):
                 padding='same',
                 data_format=data_format,
                 activation=tf.nn.relu),
+            l.BatchNormalization(),
             max_pool,
             l.Flatten(),
             l.Dense(500, activation=tf.nn.relu),
