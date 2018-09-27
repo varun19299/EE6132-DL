@@ -1,11 +1,11 @@
 \section {Implementation and Technical Notes}
 
-Python 3.6 was used to code, with modularity of components being the main focus. 
+Python 3.6 was used to code, with modularity of components being the main focus. \\
 
-The code has been split into logical modules:
+The code has been split into logical modules: \\
 \begin{itemize}
-\item \textbf{model_lib.py}: defines the MNIST model.
-\item \textbf{mnist_eager.py}: trains the MNIST model with \textit{tf eager execution}.
+\item \textbf{model\_lib.py}: defines the MNIST model. 
+\item \textbf{mnist\_eager.py}: trains the MNIST model with \textit{tf eager execution}. 
 \item  \textbf{README.md }: Contains relevant code documentation.
 \end{itemize}
 
@@ -64,9 +64,20 @@ We report a test accuracy of $99.11$, and with the cross entropy loss well below
 
 \begin{figure}[ht]
 \centering
-%%\includegraphics[angle=0,width=0.8\textwidth]{Figure_1.png}
+\includegraphics[angle=0,width=0.75\textwidth]{assign-2/logs/train/TensorBoard.png}
 \caption{Accuracy Loss curves for \textbf{MNIST CNN}}
 \end{figure}
+
+\subsection{Accuracy and Loss curves (with batch norm)}
+
+We note slightly faster convergence with batch normalisation.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[angle=0,width=0.8\textwidth]{assign-2/logs/train/bn.png}
+\caption{Accuracy Loss curves with batch-norm for \textbf{MNIST CNN}}
+\end{figure}
+
 
 \subsection {Code Blocks (model definition)}
 \begin{lstlisting}
@@ -142,55 +153,182 @@ Visualising Filters and Activations:
 (We skip some of the visualisations for brevity)
 
 \subsection{Filters (first conv layer)}
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.2\textwidth]{assign-2/logs/vis/filter-conv2d-0.png}
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/filter-conv2d-0.jpg}
 \caption{Filter-0}
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.2\textwidth]{assign-2/logs/vis/filter-conv2d-16.png}
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/filter-conv2d-16.jpg}
 \caption{Filter-16}
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.2\textwidth]{assign-2/logs/vis/filter-conv2d-31.png}
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/filter-conv2d-31.jpg}
 \caption{Filter-31}
 \end{subfigure}
 \end{figure}
 
 \subsection{Filters (second conv layer)}
 
-\subsection{Activations (first conv layer)}
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/0.png}
-\caption{Sample Output: label 0, prediction 0, probability 0.992}
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/filter-conv2d_1-0.jpg}
+\caption{Filter-0}
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/8.png}
-\caption{Sample Output: label 8, prediction 8, probability 0.873}
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/filter-conv2d_1-16.jpg}
+\caption{Filter-16}
+\end{subfigure}
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/filter-conv2d_1-31.jpg}
+\caption{Filter-31}
+\end{subfigure}
+\end{figure}
+
+\subsection{Activations (first conv layer)}
+
+\begin{figure}[!htbp]
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/activation-conv2d-0.jpg}
+\caption{Activation-0}
+\end{subfigure}
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/activation-conv2d-16.jpg}
+\caption{Activation-16}
+\end{subfigure}
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/activation-conv2d-31.jpg}
+\caption{Activation-31}
 \end{subfigure}
 \end{figure}
 
 \subsection{Activations (second conv layer)}
 
-
-\subsection{Occlusion Probabilities}
-
-
-\begin{figure}[h]
+\begin{figure}[!htbp]
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/0.png}
-\caption{Sample Output: label 0, prediction 0, probability 0.992}
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/activation-conv2d_1-0.jpg}
+\caption{Activation-0}
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/8.png}
-\caption{Sample Output: label 8, prediction 8, probability 0.873}
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/activation-conv2d_1-16.jpg}
+\caption{Activation-16}
+\end{subfigure}
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.4\textwidth]{assign-2/logs/vis/activation-conv2d_1-31.jpg}
+\caption{Activation-31} 
+\end{subfigure}
+\end{figure}
+
+\subsection{Occlusion Probabilities}
+
+We perform occlusion variation as a function of pixel distance by using a white patch to block the area. The patch size is $6*6$. \\
+
+\begin{figure}[!htbp]
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.7\textwidth]{assign-2/logs/occ/1d-var-7.jpg}
+\caption{1D Probability variation for occlusion of 7.}
+\end{subfigure}
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.7\textwidth]{assign-2/logs/occ/2d-var-7.jpg}
+\caption{2D Probability variation (heatmap) for occlusion of 7.}
+\end{subfigure}
+\end{figure}
+
+\section{Question 3 }
+
+We now work on different adversarial attacks, targeted, non-targeted, adding noise. 
+
+\subsection{Non-Targeted}
+
+We define the adversarial cost for gradient ascent as:
+
+$$ C = loss(\vec y_{goal}, y_{hat}(\vec x))+ \lambda \|\vec x |^2_2 $$
+
+Here, the loss used was cross entropy with the swapped labels. Regularisation with respect to the inputs was done as an optional exercise, and we noted improvements in the adversarial attack image quality. These are reported in figures 18 to 20.
+
+\begin{figure}[!htbp]
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.65\textwidth]{assign-2/logs/adv/non/adv-0.jpg}
+\caption{Digit 0, Non targeted attack}
+\end{subfigure}
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.65\textwidth]{assign-2/logs/adv/non/adv-3.jpg}
+\caption{Digit 3, Non targeted attack}
+\end{subfigure}
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.65\textwidth]{assign-2/logs/adv/non/adv-7.jpg}
+\caption{Digit 7, Non targeted attack} 
+\end{subfigure}
+\end{figure}
+
+\subsection{Targeted}
+The cost function in this case becomes:
+$$ C = \|\vec y_{goal} - y_{hat}(\vec x)\|^2_2 + \lambda \|\vec x - \vec x_{target}\|^2_2 $$
+
+We try out a variant with cross-entropy instead of MSE for comparing labels, which turns out to me more optimal. These are reported in figures 21 to 23. For brevity, we have not included the cost variation, which is more or less similar.
+
+
+
+\begin{figure}[!htbp]
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.5\textwidth]{assign-2/logs/adv/tar/2.png}
+\caption{Digit 2, targeted to be 8 }
+\end{subfigure}
+\end{figure}
+\begin{figure}[!htbp]
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.5\textwidth]{assign-2/logs/adv/tar/3.png}
+\caption{Digit 3, targeted to be 0.}
+\end{subfigure}
+\end{figure}
+
+\subsection{Adding Noise }
+
+Here, 
+$$ C = \|\vec y_{goal} - y_{hat}(\vec x)\|^2_2  $
+
+But with the noise composing the image as;
+
+$$x_{noise}=x + noise$$
+$$noise = noise + α*d$$
+\subsection{Preventing Adversarial Attacks}
+
+The most common way to prevent these attacks is to use the images as a tool for data augmentation. There are also other research works in this sub-field, including noise injection in layers, joint training, hand crafted loss expressions etc. 
+
+
+\begin{figure}[!htbp]
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.65\textwidth]{assign-2/logs/adv/adding_noise/adv-0.jpg}
+\caption{Digit 0, Non targeted attack}
+\end{subfigure}
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.65\textwidth]{assign-2/logs/adv/adding_noise/adv-3.jpg}
+\caption{Digit 3, Non targeted attack}
+\end{subfigure}
+\begin{subfigure}
+\centering
+\includegraphics[angle=0,width=0.65\textwidth]{assign-2/logs/adv/adding_noise/adv-7.jpg}
+\caption{Digit 7, Non targeted attack} 
 \end{subfigure}
 \end{figure}
