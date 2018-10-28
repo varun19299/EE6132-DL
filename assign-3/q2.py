@@ -5,14 +5,24 @@ Q2 Assignment 4
 import torch
 from torch import nn
 import numpy as np
+import argparse
+import os
+import matplotlib.pyplot as plt
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--H", type = int, default =5 ,help = "Hidden length")
+args = parser.parse_args()
 
 LR = 0.01
-EPOCH = 30
+EPOCH = 15
 ITER = 100
 ITER_EVAL = 20
 batch = 32
 
-HIDDEN = 2
+HIDDEN = args.H
+
+acc = []
+ll = []
 
 def gen_seq(L, batch = 1, i=1):
     '''
@@ -102,7 +112,7 @@ for epoch in range(EPOCH):
         train_accuracy += np.sum(pred_y == y_o.numpy()).sum()
 
     train_accuracy = float(train_accuracy)/(ITER * batch)
-
+    ll.append(loss)
     test_accuracy = 0
 
     for i in range(ITER_EVAL):
@@ -123,8 +133,28 @@ for epoch in range(EPOCH):
        
 
     test_accuracy = float(test_accuracy)/(ITER_EVAL * batch)
-
+    acc.append(test_accuracy)
     print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.numpy(), 
     '| train accuracy: %.4f' % train_accuracy, '| test accuracy: %.4f' % test_accuracy)
 
+plt.plot(np.arange(EPOCH),acc, ll)
+plt.legend(['Accuracy (test)','Loss (train)'])
+plt.title(f"Accuracy-Loss versus Epochs for Hidden units {args.H}")
+plt.savefig(f"logs/Q2-A-L-{args.H}.png")
+plt.show()
 
+L = np.random.randint(low = 3, high = 10)
+d,b_x,y_o, b_y = gen_seq(L, batch = 1)
+
+b_x = b_x.view(1, L, 10)              # reshape x to (batch, time_step, input_size)
+b_x = b_x.float()
+y_o = y_o.long()
+
+output = rnn(b_x)                               # rnn output
+
+loss = loss_func(output, y_o)                   # cross entropy loss
+
+pred_y = torch.max(output, 1)[1].data.numpy().squeeze()
+print(f"Input Sequence {d}")
+print(f"Truth {y_o}")
+print(f"Prediction {pred_y}")
