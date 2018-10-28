@@ -21,7 +21,7 @@ ITER = 1000
 ITER_EVAL = 20
 batch = 32
 
-HIDDEN = 10
+HIDDEN = 5
 
 L = args.L
 
@@ -111,7 +111,7 @@ optimizer = torch.optim.Adam(rnn.parameters(), lr=LR)   # optimize all cnn param
 if loss_type == "MSE":
     loss_func = nn.MSELoss()
 else: 
-    loss_func = nn.NLLLoss()                       # the target label is not one-hotted
+    loss_func = nn.CrossEntropyLoss()                       # the target label is not one-hotted
 
 
 train_acc = []
@@ -136,7 +136,7 @@ for epoch in range(EPOCH):
         
         if loss_type != "MSE":
             b_y2 = b_y.numpy().copy()
-            # b_y2 = np.argmax(b_y2, axis=1)
+            b_y2 = np.argmax(b_y2, axis=1)
 
             b_y2 = torch.Tensor(b_y2)
 
@@ -243,15 +243,15 @@ if not os.path.exists("logs"):
 
 plt.plot(np.arange(EPOCH),train_acc, test_acc)
 plt.title(f"Accuracy-versus-Epochs-{args.L}-{loss_type}.png")
-plt.save(f"logs/Accuracy-{args.L}-{loss_type}.png")
+plt.savefig(f"logs/Accuracy-{args.L}-{loss_type}-hidden-{HIDDEN}.png")
 plt.show()
 
 plt.plot(np.arange(EPOCH),train_ll, test_ll)
 plt.title(f"Loss-versus-Epochs-{args.L}-{loss_type}.png")
-plt.save(f"logs/Loss-{args.L}-{loss_type}.png")
+plt.savefig(f"logs/Loss-{args.L}-{loss_type}-hidden-{HIDDEN}.png")
 plt.show()
 
 plt.plot(np.arange(20)+1, av_acc)
 plt.title(f"Average accuracy versus sequece length for loss {loss_type}")
-plt.save(f"logs/AV-Loss-{args.L}-{loss_type}.png")
+plt.savefig(f"logs/AV-Loss-{args.L}-{loss_type}-hidden-{HIDDEN}.png")
 plt.show()
