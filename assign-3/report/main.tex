@@ -309,26 +309,34 @@ $$ C = \|\vec y_{goal} - y_{hat}(\vec x)\|^2_2  $
 But with the noise composing the image as;
 
 $$x_{noise}=x + noise$$
-$$noise = noise + α*d$$
-\subsection{Preventing Adversarial Attacks}
 
-The most common way to prevent these attacks is to use the images as a tool for data augmentation. There are also other research works in this sub-field, including noise injection in layers, joint training, hand crafted loss expressions etc. 
+\section{Question 3}
 
+We use a LSTM for this question with hidden (state) size as 5. We notice that increasing this to 10 improves accuracy (nearly 100\%) and decreasing to 2 lowers accuracy. These plots however, aren't included here, and we experiment with state size 5.
+
+Hyper-parameters:
+\begin{itemize}
+\item  Adam optimiser, lr = 0.01, beta1 = 0.9, beta2 = 0.99
+\item  Loss : MSE and Cross Entropy
+\item  Single hidden layer, 5 units wide.
+\end{itemize}
+
+\subsection{MSE vs Cross Entropy}
+We also note that MSE performs much better than Cross Entropy. This is because the output sequence is a binary number and their probabilities are correlated. Hence, we cannot use a "clean" version of cross entropy with $L$ distinct distributions. We use a hackish method to use cross entropy, and for the reasons noted above, it performs poorly.
 
 \begin{figure}[!htbp]
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-2/logs/adv/adding_noise/adv-0.jpg}
-\caption{Digit 0, Non targeted attack}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/}
+\caption{$L=5$, Cross Entropy Loss}
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-2/logs/adv/adding_noise/adv-3.jpg}
-\caption{Digit 3, Non targeted attack}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-2/logs/adv/adding_noise/adv-7.jpg}
-\caption{Digit 7, Non targeted attack} 
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/}
+\caption{$L=5$, MSE Loss}
 \end{subfigure}
 \end{figure}
+
+
+
+ 
