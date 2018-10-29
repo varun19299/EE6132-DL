@@ -21,7 +21,7 @@ We use \textit{pytorch } to train the MNIST RNN Model of the following architect
 The code to train the model is:
 
 \begin{lstlisting}
-python3 q1.py
+python3 q1.py --model LSTM --bi 1 -l 64
 \end{lstlisting}
 
 \begin{itemize}
@@ -41,7 +41,7 @@ For each model we try the following configuration:
 \item Hidden sizes (64, 64) : two layers
 \end{itemize}
 
-We report train loss, test loss and test accuracy with this. As usual, we compute the average loss across 10,000 samples for each experiment. We do so by running every evaluation step on the whole 10,000 samples. We find comparable performance across all models, with more accuracy with more layers and with a LSTM.
+We report train loss, test loss and test accuracy with this. As usual, we compute the average loss across 10,000 samples for each experiment. We do so by running every evaluation step on the whole 10,000 samples. We find comparable performance across all models (except vanilla RNNs) , with more accuracy with more layers and with a LSTM. This is due to fewer parameters in a vanilla RNN, and the poor handling of long sequences. However, with more hidden layers, the accuracy improves.
 
 \begin{figure}[!htbp]
 \begin{subfigure}
@@ -56,7 +56,7 @@ We report train loss, test loss and test accuracy with this. As usual, we comput
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-[64, 64].pngg}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-[64, 64].png}
 \caption{$H=64, 128$, LSTM, Accuracy Loss Curves}
 \end{subfigure}
 \end{figure}
@@ -73,7 +73,7 @@ We report train loss, test loss and test accuracy with this. As usual, we comput
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-[64, 64].pngg}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-[64, 64].png}
 \caption{$H=64, 128$, RNN, Accuracy Loss Curves}
 \end{subfigure}
 \end{figure}
@@ -90,7 +90,7 @@ We report train loss, test loss and test accuracy with this. As usual, we comput
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-[64, 64].pngg}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-[64, 64].png}
 \caption{$H=64, 128$, GRU, Accuracy Loss Curves}
 \end{subfigure}
 \end{figure}
@@ -100,17 +100,17 @@ We also experiment with bi directional models.
 \begin{figure}[!htbp]
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-bidirectional-[64].png}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-[64].png}
 \caption{$H=64$, GRU bidirectional, Accuracy Loss Curves}
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-bidirectional-[128].png}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-[128].png}
 \caption{$H=128$, GRU bidirectional, Accuracy Loss Curves}
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-bidirectional-[64, 64].pngg}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-[64, 64].png}
 \caption{$H=64, 128$, GRU bidirectional, Accuracy Loss Curves}
 \end{subfigure}
 \end{figure}
@@ -118,17 +118,17 @@ We also experiment with bi directional models.
 \begin{figure}[!htbp]
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-bidirectional-[64].png}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-[64].png}
 \caption{$H=64$, RNN bidirectional, Accuracy Loss Curves}
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-bidirectional-[128].png}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-[128].png}
 \caption{$H=128$, RNN bidirectional, Accuracy Loss Curves}
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-bidirectional-[64, 64].pngg}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-[64, 64].pngg}
 \caption{$H=64, 128$, RNN bidirectional, Accuracy Loss Curves}
 \end{subfigure}
 \end{figure}
@@ -136,17 +136,17 @@ We also experiment with bi directional models.
 \begin{figure}[!htbp]
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-bidirectional-[64].png}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-[64].png}
 \caption{$H=64$, LSTM bidirectional, Accuracy Loss Curves}
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-bidirectional-[128].png}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-[128].png}
 \caption{$H=128$, LSTM bidirectional, Accuracy Loss Curves}
 \end{subfigure}
 \begin{subfigure}
 \centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-bidirectional-[64, 64].pngg}
+\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-[64, 64].png}
 \caption{$H=64, 128$, LSTM bidirectional, Accuracy Loss Curves}
 \end{subfigure}
 \end{figure}
