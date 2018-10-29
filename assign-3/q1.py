@@ -142,8 +142,8 @@ for epoch in range(EPOCH):
             print('Epoch: ', epoch, '| Step: ', step,'| train loss: %.4f' % loss.data.numpy(), '| test accuracy: %.2f' % accuracy)
 
             test_acc.append(accuracy)
-            train_ll.append(loss)
-            test_ll.append(test_loss)
+            train_ll.append(float(loss.detach().numpy()))
+            test_ll.append(float(test_loss.detach().numpy()))
 
 # print 10 predictions from test data
 test_output = rnn(test_x[:10].view(-1, 28, 28))
@@ -155,12 +155,14 @@ print(f"Len {len(test_acc)}")
 print(f"Len {len(test_ll)}")
 print(f"Len {len(train_ll)}")
 
-
-plt.plot(np.arange(len(test_acc))*50,test_acc, train_ll, test_ll)
+print(train_ll)
+plt.plot(np.arange(len(test_acc))*50,test_acc )
+plt.plot(np.arange(len(test_acc))*50, train_ll)
+plt.plot(np.arange(len(test_acc))*50, test_ll)
 plt.legend(['Accuracy (test)','Loss (train)', 'Loss (test)'])
 plt.title(f"Accuracy-Loss versus Steps for Hidden units {args.list}")
 if not args.bi:
     plt.savefig(f"logs/Q1-MNIST-{args.model}-{args.list}.png")
 else:
     plt.savefig(f"logs/Q1-MNIST-{args.model}-bidirectional-{args.list}.png")
-plt.show()
+plt.close()
