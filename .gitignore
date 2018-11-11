@@ -7,3 +7,6 @@
 
 # Ignore weight files
 */*/*.npz
+
+# Ignore .pth
+*/*/*.pth
