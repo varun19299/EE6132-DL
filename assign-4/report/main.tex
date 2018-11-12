@@ -2,17 +2,12 @@
 
 Python 3.6 was used to code, with modularity of components being the main focus. \\
 
-The code has been split into logical modules: \\
-\begin{itemize}
-\item \textbf{model\_lib.py}: defines the MNIST model. 
-\item \textbf{mnist\_eager.py}: trains the MNIST model with \textit{tf eager execution}. 
-\item  \textbf{README.md }: Contains relevant code documentation.
-\end{itemize}
+The code has been split into modules as per the required question
 
 
 \section {Question 1}
 
-We use \textit{pytorch } to train the MNIST RNN Model of the following architecture:
+We use \textit{scikit} to perform PCA, and \textit{pytorch } to train linear and deep auto-encoder models.
 
 \begin{lstlisting}
 
@@ -21,184 +16,131 @@ We use \textit{pytorch } to train the MNIST RNN Model of the following architect
 The code to train the model is:
 
 \begin{lstlisting}
-python3 q1.py --model LSTM --bi 1 -l 64
+python3 q1.py 
 \end{lstlisting}
 
 \begin{itemize}
 \item Learning rate of $1e-3$, with Adam was used as the optimiser.
 \item We periodically run evaluation post an epoch. 
-\item Loss is Cross Entropy
-\item Models testsed are LSTMs, GRUs, RNNs, with varying hidden unit sizes.
-\item L2 Regularisation 0.01 used always.
+\item Loss is MSE with respect to reconstruction.
 \end{itemize}
 
 \subsection{Accuracy and Loss Plots}
 
-For each model we try the following configuration:
+We report MSE loss convergence for the autoencoder models, along with their image reconstructions.
+
+We observe the following:
+
 \begin{itemize}
-\item  Hidden size 64
-\item Hidden size 128
-\item Hidden sizes (64, 64) : two layers
+\item The linear autoencoder performs comparatively to PCA, however, with a different latent space representation. This is intuitive, since a PCA is the best fit linear transform, and if the network were optimal, it would mimic PCA.
+\item  The deep autoencoder does much better than PCA, and has less than $1e-3$ MSE error when trained for more than 12 epochs (batch size 256). This is due to the fact that manifold learning, and not necessarily a linear transformation can occur.
 \end{itemize}
-
-We report train loss, test loss and test accuracy with this. As usual, we compute the average loss across 10,000 samples for each experiment. We do so by running every evaluation step on the whole 10,000 samples. We find comparable performance across all models (except vanilla RNNs) , with more accuracy with more layers and with a LSTM. This is due to fewer parameters in a vanilla RNN, and the poor handling of long sequences. However, with more hidden layers, the accuracy improves.
-
 \begin{figure}[!htbp]
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-[64].png}
-\caption{$H=64$, LSTM, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-[128].png}
-\caption{$H=128$, LSTM, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-[64, 64].png}
-\caption{$H=64, 128$, LSTM, Accuracy Loss Curves}
-\end{subfigure}
-\end{figure}
-\begin{figure}[!htbp]
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-[64].png}
-\caption{$H=64$, RNN, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-[128].png}
-\caption{$H=128$, RNN, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-[64, 64].png}
-\caption{$H=64, 128$, RNN, Accuracy Loss Curves}
-\end{subfigure}
-\end{figure}
-\begin{figure}[!htbp]
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-[64].png}
-\caption{$H=64$, GRU, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-[128].png}
-\caption{$H=128$, GRU, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-[64, 64].png}
-\caption{$H=64, 128$, GRU, Accuracy Loss Curves}
-\end{subfigure}
-\end{figure}
-
-We also experiment with bi directional models.
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/pca.png}
+          \caption{PCA Reconstruction, 30 components.}
+          \end{subfigure}
+          \end{figure}
 
 \begin{figure}[!htbp]
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-[64].png}
-\caption{$H=64$, GRU bidirectional, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-[128].png}
-\caption{$H=128$, GRU bidirectional, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-GRU-[64, 64].png}
-\caption{$H=64, 128$, GRU bidirectional, Accuracy Loss Curves}
-\end{subfigure}
-\end{figure}
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/linear_autoencoder/image_90.png}
+          \caption{Linear Autoencoder, 1000 - 500 - 250 - 30 - 250 - 500 - 1000, reconstruction}
+          \end{subfigure}
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/image-90.png}
+          \caption{MSE Loss training convergence}
+          \end{subfigure}
+          \end{figure}
+          
+          \begin{figure}[!htbp]
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/deep_autoencoder/image_90.png}
+          \caption{Deep Autoencoder, 1000 - 500 - 250 - 30 - 250 - 500 - 1000, reconstruction}
+          \end{subfigure}
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/image-90.png}
+          \caption{MSE Loss training convergence}
+          \end{subfigure}
+          \end{figure}
 
-\begin{figure}[!htbp]
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-[64].png}
-\caption{$H=64$, RNN bidirectional, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-[128].png}
-\caption{$H=128$, RNN bidirectional, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-RNN-[64, 64].pngg}
-\caption{$H=64, 128$, RNN bidirectional, Accuracy Loss Curves}
-\end{subfigure}
-\end{figure}
 
-\begin{figure}[!htbp]
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-[64].png}
-\caption{$H=64$, LSTM bidirectional, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-[128].png}
-\caption{$H=128$, LSTM bidirectional, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q1-MNIST-LSTM-[64, 64].png}
-\caption{$H=64, 128$, LSTM bidirectional, Accuracy Loss Curves}
-\end{subfigure}
-\end{figure}
+
 
 \section{Question 2 }
 
-We use a LSTM with the following hyper-parameters:
-
-\begin{itemize}
-\item  Adam optimiser, lr = 0.01, beta1 = 0.9, beta2 = 0.99
-\item  Loss : Cross Entropy
-\item  Single hidden layer, : 2,5,10 units wide.
+We design a standard Auto-encoder, with once hidden unit and experiment for various hidden units, of sizes: [64,128,256,512]. 
 \end{itemize}
 
 The outputs of this question may be generated by:
-
 \begin{lstlisting}
-python3 q3.py --H 5
+python3 q2.py 
 \end{lstlisting} 
 
-We notice that increasing the hidden unit size increases the accuracy, due to better representation power.
-
-We also perform randomised testing in the following format:\\
-\begin{lstlisting}
-Input Sequence tensor([[3, 5, 8, 6, 8]], dtype=torch.int32)
-Truth tensor([5])
-Prediction 5
-\end{lstlisting}
+We notice that increasing the hidden unit size increases the accuracy of reconstruction, due to better representation power.
 
 \subsection{Loss and Accuracy Curves for H values}
 
 \begin{figure}[!htbp]
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q2-A-L-2.png}
-\caption{$H=3$, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q2-A-L-5.png}
-\caption{$H=5$, Accuracy Loss Curves}
-\end{subfigure}
-\begin{subfigure}
-\centering
-\includegraphics[angle=0,width=0.65\textwidth]{assign-3/logs/Q2-A-L-10.png}
-\caption{$H=10$,Accuracy Loss Curves}
-\end{subfigure}
-\end{figure}
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/deep_autoencoder/image_90.png}
+          \caption{Deep Autoencoder, 1000 - 500 - 250 - 30 - 250 - 500 - 1000, reconstruction}
+          \end{subfigure}
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/image-90.png}
+          \caption{MSE Loss training convergence}
+          \end{subfigure}
+          \end{figure}
+          \begin{figure}[!htbp]
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/deep_autoencoder/image_90.png}
+          \caption{Deep Autoencoder, 1000 - 500 - 250 - 30 - 250 - 500 - 1000, reconstruction}
+          \end{subfigure}
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/image-90.png}
+          \caption{MSE Loss training convergence}
+          \end{subfigure}
+          \end{figure}
+          
+          \begin{figure}[!htbp]
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/deep_autoencoder/image_90.png}
+          \caption{Deep Autoencoder, 1000 - 500 - 250 - 30 - 250 - 500 - 1000, reconstruction}
+          \end{subfigure}
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/image-90.png}
+          \caption{MSE Loss training convergence}
+          \end{subfigure}
+          \end{figure}
+          
+       \begin{figure}[!htbp]
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/deep_autoencoder/image_90.png}
+          \caption{Deep Autoencoder, 1000 - 500 - 250 - 30 - 250 - 500 - 1000, reconstruction}
+          \end{subfigure}
+          \begin{subfigure}
+          \centering
+          \includegraphics[angle=0,width=0.65\textwidth]{assign-4/logs/q1/image-90.png}
+          \caption{MSE Loss training convergence}
+          \end{subfigure}
+          \end{figure}
+          
 
 \section{Question 3}
 
-We use a LSTM for this question with hidden (state) size as 5. We notice that increasing this to 10 improves accuracy (nearly 100\%) and decreasing to 2 lowers accuracy. These plots however, aren't included here, and we experiment with state size 5.
+We implement sparsity by pytorch's L1 weight penalisation, over the latent representation.
 
 The outputs of this question may be generated by:
 
