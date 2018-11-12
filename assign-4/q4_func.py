@@ -1,3 +1,4 @@
+
 '''
 Functions for q4
 '''
@@ -206,6 +207,7 @@ def do_autoencoder(train_loader, device = torch.device('cpu'), noise = 0.3, lear
 
     # Plot convergence
     path =f'./logs/q4/convergence-noise-{noise}.png'
+    print(loss_ll)
     plt.plot(np.arange(len(loss_ll))+1, loss_ll)
     plt.title(f"Loss convergence noise {noise} q4")
     plt.xlabel("Epochs")

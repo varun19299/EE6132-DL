@@ -176,10 +176,10 @@ def do_autoencoder(train_loader, device = torch.device('cpu'), sparsity = 0.1, l
             img = img.view(img.size(0), -1).to(device)
         
             # ===================forward=====================
-            output, _ = model(img)
+            output, latent = model(img)
             loss = criterion(output, img)
-            all_params = torch.cat([x.view(-1) for x in model.encoder.parameters()])
-            l1_regularization = sparsity * torch.norm(all_params, 1)
+            # all_params = torch.cat([x.view(-1) for x in model.encoder.parameters()])
+            l1_regularization = sparsity * torch.norm(latent, 1)
             loss = loss + l1_regularization
             # ===================backward====================
             optimizer.zero_grad()
