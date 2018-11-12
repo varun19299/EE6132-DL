@@ -122,7 +122,8 @@ def save_checkpoint(state, is_best = True, filename='checkpoint.pth.tar'):
         shutil.copyfile(filename, 'model_best.pth.tar')
 
 def do_autoencoder(train_loader, device = torch.device('cpu'), hidden_size = 128, learning_rate = 0.01, num_epochs = 100 ):
-    
+    loss_ll=[]
+
     # Labels
     label = "deep"
 
@@ -166,6 +167,7 @@ def do_autoencoder(train_loader, device = torch.device('cpu'), hidden_size = 128
             optimizer.step()
         # ===================log========================
         print(f'epoch [{epoch + 1,}/{num_epochs}], loss:{loss.data.item() :.4f}')
+        loss_ll.append(loss.data.item())
 
         if epoch % 5 == 0:
             # Run eval
@@ -174,6 +176,14 @@ def do_autoencoder(train_loader, device = torch.device('cpu'), hidden_size = 128
 
         # Increment
         epoch+=1
+
+    # Plot convergence
+    path =f'./logs/q2/convergence-{label}_autoencoder_hidden_{hidden_size}.png'
+    plt.plot(np.arange(len(loss_ll))+1, loss_ll)
+    plt.title("Loss convergence q2")
+    plt.xlabel("Epochs")
+    plt.savefig(path)
+    plt.close()
 
     path = './checkpoints/q2/'
     print(f"Saving checkpoint at {path}")
@@ -192,7 +202,7 @@ def do_autoencoder(train_loader, device = torch.device('cpu'), hidden_size = 128
     for data in train_loader:
         img, _ = data 
         img = img.view(img.size(0), -1)
-        img = img.to(torch.device("cpu"))
+        img = img.to(torch.device("cpu")) 
         break 
     path = f'./logs/q2/{label}_autoencoder_hidden_{hidden_size}/'
     do_inference(model.to(torch.device("cpu")), digit = img[0], path = path, device = device)

@@ -33,8 +33,8 @@ else:
 
 # torch.manual_seed(1)    # reproducible
 # Hyper Parameters
-EPOCHS = 100               # train the training data n times, to save time, we just train 1 epoch
-BATCH_SIZE = 1024
+EPOCHS = 10               # train the training data n times, to save time, we just train 1 epoch
+BATCH_SIZE = 256
 INPUT_SIZE = 28         # image width, height
 LR = 0.01               # learning rate
 DOWNLOAD_MNIST = True   # set to True if haven't download the data
@@ -71,7 +71,7 @@ test_x = test_data.test_data.type(
     torch.FloatTensor)[:2000] / 255.   # shape (2000, 28, 28) value in range(0,1)
 test_y = test_data.test_labels.numpy().squeeze()[:2000]    # covert to numpy array
 
-# PCA
+# PCA 
 do_PCA(train_data, supress = True)
 
 do_autoencoder(train_loader, device = args.device, deep = False, learning_rate = LR, num_epochs = EPOCHS )

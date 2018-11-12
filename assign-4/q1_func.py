@@ -1,5 +1,5 @@
 '''
-Functions for q1
+Functions for q1 
 ''' 
 import numpy as np
 import os
@@ -108,7 +108,7 @@ def to_img(x, deep = True):
     return x
 
 def do_autoencoder(train_loader, device = torch.device('cpu') , deep = True, learning_rate = 0.01, num_epochs = 100 ):
-    
+    loss_ll=[]
     # Labels
     if deep:
         label = "deep"
@@ -140,10 +140,19 @@ def do_autoencoder(train_loader, device = torch.device('cpu') , deep = True, lea
             optimizer.step()
         # ===================log========================
         print(f'epoch [{epoch + 1,}/{num_epochs}], loss:{loss.data.item() :.4f}')
+        loss_ll.append(loss.data.item())
 
         if epoch % 10 == 0:
             pic = to_img(output.to(device).data, deep = deep)
-            save_image(pic, f'./logs/q1/{label}_autoencoder/image_{epoch}.png')
+            save_image(pic[:16], f'./logs/q1/{label}_autoencoder/image_{epoch}.png')
+
+    # Plot convergence
+    path =f'./logs/q1/convergence-{label}_autoencoder.png'
+    plt.plot(np.arange(len(loss_ll))+1, loss_ll)
+    plt.title("Loss convergence q1")
+    plt.xlabel("Epochs")
+    plt.savefig(path)
+    plt.close()
 
     if not os.path.exists('./checkpoints/q1/'):
         os.mkdir('./checkpoints/q1/')
